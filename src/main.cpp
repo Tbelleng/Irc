@@ -6,19 +6,23 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 16:19:46 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/06 16:05:14 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/08 16:29:01 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "server.hpp"
+#include "../server.hpp"
+#include "epoll_handle.cpp"
 #include <iostream>
 #include <cstring>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <map>
 
 int main(int argc, char **argv) 
 {
+    (void)argc;
+    (void)argv;
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
         std::cerr << "Error creating socket" << std::endl;
@@ -35,7 +39,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    // Listen for incoming connections
     if (listen(serverSocket, 5) == -1) {
         std::cerr << "Error listening on socket" << std::endl;
         close(serverSocket);
@@ -44,7 +47,6 @@ int main(int argc, char **argv)
 
     std::cout << "Server listening on port 5500..." << std::endl;
 
-    // Accept incoming connections and handle messages
     while (true) {
         struct sockaddr_in clientAddress;
         socklen_t clientAddrLen = sizeof(clientAddress);
@@ -54,7 +56,7 @@ int main(int argc, char **argv)
             std::cerr << "Error accepting connection" << std::endl;
             continue;
         }
-
+        
         char buffer[256];
         ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
         if (bytesRead == -1) {
@@ -65,17 +67,23 @@ int main(int argc, char **argv)
 
         buffer[bytesRead] = '\0';
 
+        std::cout << "On recoit le message : " << buffer << std::endl;
         std::cout << "Received message: " << buffer << std::endl;
-
+    
+        if (strncmp(buffer, "CAP LS", 6) == 0) {
+        const char* capListResponse = "/USER\n";
+        ssize_t capListBytesSent = send(clientSocket, capListResponse, strlen(capListResponse), 0);
+        
+        (void)capListBytesSent;
+        }
         const char* response = "Message received\n";
         ssize_t bytesSent = send(clientSocket, response, strlen(response), 0);
         if (bytesSent == -1) {
             std::cerr << "Error sending response" << std::endl;
         }
-
-        close(clientSocket);
+        //if (false)
+        //    close(clientSocket);
     }
-
     close(serverSocket);
     return 0;
 }
