@@ -8,6 +8,7 @@
   <br />
   <br />
   <img src="https://img.shields.io/badge/c_98%2B-A8B9CC?style=for-the-badge&logo=c&logoColor=white" alt="c98+" />
+  <img src="https://img.shields.io/badge/CMake-%23008FBA.svg?style=for-the-badge&logo=cmake&logoColor=white" alt="cmake" />
 </p>
 
 ---
