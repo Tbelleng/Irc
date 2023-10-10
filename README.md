@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://static.wikia.nocookie.net/logopedia/images/a/a5/MSN_Messenger_2000_%28Icon%29.png/revision/latest?cb=20230101195823" width=200 alt="msn-logo" />
 </p>
-<h3 align="center">IRC</h3>
+<h3 align="center">ft_irc</h3>
 
 <p align="center">
   Creating our own Internet Relay Chat service.
