@@ -16,7 +16,6 @@
 ## Table of contents 
 - [About](#about)
 - [Ressources](#ressources)
-- [More](#more)
 
 ## About <a name="about"></a>
 
