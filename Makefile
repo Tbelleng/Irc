@@ -19,11 +19,12 @@ SRCS = $(SRC_DIR)main.cpp	\
 OBJS_DIR = ./obj/
 
 OBJS = $(SRCS:$(SRC_DIR)%.cpp=$(OBJS_DIR)%.o)
+DEPS = $(SRCS:$(SRC_DIR)%.cpp=$(OBJS_DIR)%.d)
 INCLUDE = Fixed.hpp
 AR = #ar rcs
 RM = rm -f
-CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+CXX = c++
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I.
 
 all: $(NAME)
 
@@ -31,7 +32,7 @@ $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)
 
 $(OBJS_DIR)%.o: $(SRC_DIR)%.cpp | $(OBJS_DIR)
-	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(CXX) $(CFLAGSXX) -MMD -c $< -o $@
 
 
 $(NAME): $(OBJS)
@@ -40,7 +41,7 @@ $(NAME): $(OBJS)
 	@echo "    Loading quantum version..."
 	@echo "Project name: $(NAME)"
 	@echo "\n\033[1;32mCompilation... ⌛\033[0;m\n"
-	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 	@echo -n "\r 5%  [\033[0;31m█\033[m.........................]"
 	@sleep 0.01
 	@echo -n "\r 10%  [\033[0;31m███\033[m.......................]"
@@ -70,6 +71,8 @@ $(NAME): $(OBJS)
 	@echo -n "\r 99%  [\033[0;31m██████████████████████████\033[m]"
 	@sleep 1
 	@echo -n "\r 100% [\033[0;32m██████████████████████████\033[m]\033[0;32m compilation finished ✓\n\033[0;m"
+
+-include $(DEPS)
 
 clean:
 	@echo "\033[1;1;32m♻️  Objects have been \033[5;1;31mdeleted\033[m ♻️"
