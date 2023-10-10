@@ -7,7 +7,7 @@
   Creating our own Internet Relay Chat service.
   <br />
   <br />
-  <img src="https://img.shields.io/badge/c_99%2B-A8B9CC?style=for-the-badge&logo=c&logoColor=white" alt="c 99+" />
+  <img src="https://img.shields.io/badge/c_98%2B-A8B9CC?style=for-the-badge&logo=c&logoColor=white" alt="c98+" />
 </p>
 
 ---
