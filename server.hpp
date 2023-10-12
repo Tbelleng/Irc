@@ -13,6 +13,8 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+# include <algorithm>
+# include <vector>
 # include <iostream>
 # include <cstring>
 # include <stdio.h>

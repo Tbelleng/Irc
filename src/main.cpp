@@ -10,12 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../server.hpp"
-#include <iostream>
-#include <cstring>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
+# include "server.hpp"
 
 int main(int argc, char **argv) 
 {
@@ -37,6 +32,12 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    int epfd = epoll_create1(0);
+    struct epoll_event event;
+    event.events = EPOLLIN;
+    event.data.fd = serverSocket;
+    epoll_ctl(epfd, EPOLL_CTL_ADD, serverSocket, &event);
+
     // Listen for incoming connections
     if (listen(serverSocket, 5) == -1) {
         std::cerr << "Error listening on socket" << std::endl;
@@ -44,61 +45,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    int epfd = epoll_create1(0);
-    struct epoll_event event;
-    event.events = EPOLLIN;
-    event.data.fd = serverSocket;
-    epoll_ctl(epfd, EPOLL_CTL_ADD, serverSocket, &event);
-
     std::cout << "Server listening on port 5500..." << std::endl;
 
-    // Accept incoming connections and handle messages
-    while (true) {
-        struct epoll_event events[10];
-        int num_events = epoll_wait(epfd, events, 10, -1);
-        for (int i = 0; i < num_events; i++) {
-            if (events[i].data.fd == serverSocket) {
-                // Nouvelle connexion
-                struct sockaddr_in clientAddress;
-                socklen_t clientAddrLen = sizeof(clientAddress);
-                int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &clientAddrLen);
-
-                if (clientSocket == -1) {
-                    std::cerr << "Error accepting connection" << std::endl;
-                    continue;
-                }
-                event.events = EPOLLIN;
-                event.data.fd = clientSocket;
-                epoll_ctl(epfd, EPOLL_CTL_ADD, clientSocket, &event);
-            } else {
-                // Message d'un client
-                char buffer[1024];
-                int bytes = recv(events[i].data.fd, buffer, sizeof(buffer) - 1, 0);
-                if (bytes <= 0) {
-                    // Client déconnecté ou erreur
-                    close(events[i].data.fd);
-                    epoll_ctl(epfd, EPOLL_CTL_DEL, events[i].data.fd, NULL);
-                } else {
-                    // Echo back
-                    buffer[bytes] = '\0';
-                    std::cout << buffer << std::endl;
-                    const char* response = "hello world\n";
-                    const char* response1 = "New user is connected\n";
-                    ssize_t bytesSent = send(events[i].data.fd, response, strlen(response), 0);
-                    std::cout << i << std::endl;
-                    if (i > 1)
-                        send(events[i].data.fd, response1, strlen(response1), 0);
-                    if (bytesSent == -1) {
-                        std::cerr << "Error sending response" << std::endl;
-                    }
-                }
-            }
-        }
-        char buffer[1024];
-       recv(events[0].data.fd, buffer, sizeof(buffer) -1, 0);
-        send(events[0].data.fd,"ok\n", 3, 0);
-        std::cout << buffer << std::endl;
-    }
     close(epfd);
     close(serverSocket);
     return 0;
