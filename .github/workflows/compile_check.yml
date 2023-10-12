@@ -14,9 +14,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up g++ compiler
-      run: sudo apt-get install c++
-      
     - name: Compile code
       run: make
 
