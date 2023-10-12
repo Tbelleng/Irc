@@ -1,0 +1,24 @@
+name: Compile Check
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up g++ compiler
+      run: sudo apt-get install c++
+      
+    - name: Compile code
+      run: make
+
+    - name: Run compilation test
+      run: ./ircserv 5500 gallieni
