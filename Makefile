@@ -25,7 +25,7 @@ INCLUDE = Fixed.hpp Channel.hpp
 AR = #ar rcs
 RM = rm -f
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I.
 
 all: $(NAME)
 

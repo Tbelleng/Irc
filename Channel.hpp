@@ -1,12 +1,12 @@
 #pragma once
 
-# include "irc.hpp"
+# include "server.hpp"
 
 # define DEBUG 1
 
 class   Channel {
 private:
-    vector<int> member;
+    std::vector<int> member;
     std::string name;
 
 public:
@@ -17,6 +17,6 @@ public:
     std::string     getName(void) const;
     void            addMember(int newMember);
     void            suppMember(int suppMember);
-    vector<int>     getAllMember( void ) const;
-    int             sendMessage(std::string message, const int epoll_fd) const;
+    std::vector<int>     getAllMember( void ) const;
+    int             sendMessage(const char* message, const int epfd, struct epoll_event& ev) const;
 };

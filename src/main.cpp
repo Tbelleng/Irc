@@ -11,11 +11,15 @@
 /* ************************************************************************** */
 
 # include "server.hpp"
+# include "Channel.hpp" 
+
+int MAX_UTILISATEURS = 5;
 
 int main(int argc, char **argv) 
 {
-    (void) argc;
-    (void) argv;
+    (void)argc;
+    (void)argv;
+
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
         std::cerr << "Error creating socket" << std::endl;
@@ -32,14 +36,20 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    int epfd = epoll_create1(0);
-    struct epoll_event event;
-    event.events = EPOLLIN;
-    event.data.fd = serverSocket;
-    epoll_ctl(epfd, EPOLL_CTL_ADD, serverSocket, &event);
+    int epoll_fd = epoll_create1(0);
+    if (epoll_fd == -1)
+    {
+        perror("Error while creating Epoll");
+        return 0;
+    }
 
-    // Listen for incoming connections
-    if (listen(serverSocket, 5) == -1) {
+    struct epoll_event event;
+    event.data.fd = serverSocket;
+    event.events = EPOLLIN;
+
+
+    if (listen(serverSocket, MAX_UTILISATEURS) == -1) 
+    {
         std::cerr << "Error listening on socket" << std::endl;
         close(serverSocket);
         return 1;
@@ -47,7 +57,57 @@ int main(int argc, char **argv)
 
     std::cout << "Server listening on port 5500..." << std::endl;
 
-    close(epfd);
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, serverSocket, &event) == -1) 
+    {
+        perror("Error adding socket");
+        close(epoll_fd);
+        close(serverSocket);
+        return 0;
+    }
+
+    Channel Channel1("Channel1");
+
+    while (true) 
+    {
+        struct epoll_event events[1];
+        int new_event = epoll_wait(epoll_fd, events, MAX_UTILISATEURS, -1);
+        if (new_event == -1) {
+            perror("epoll_wait");
+            return 0;
+        }
+        int i = 0;
+        while (i < new_event)
+        {
+            if (events[i].data.fd == serverSocket)
+                {
+                    struct sockaddr_in clientAddress;
+                    socklen_t clientAddrLen = sizeof(clientAddress);
+                    int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &clientAddrLen);
+
+                    Channel1.addMember(clientSocket);
+                    if (clientSocket == -1)
+                        perror("accept");
+                    else
+                    {
+                        event.events = EPOLLIN;
+                        event.data.fd = clientSocket;
+                        if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientSocket, &event) == -1)
+                        {
+                            perror("epoll_ctl");
+                            return 0;
+                        }
+                    }
+                }
+            else 
+            {
+                char buffer[512];
+                int bytes_read = read(events[i].data.fd, buffer, sizeof(buffer));
+                write(events[i].data.fd, buffer, bytes_read);
+            }
+            i++;
+            Channel1.sendMessage("Hello world", epoll_fd, events[1]);
+        }
+    }
     close(serverSocket);
     return 0;
 }
