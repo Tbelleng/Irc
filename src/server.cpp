@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/12 14:53:58 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/12 20:51:44 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ Server::~Server(void)
 void Server::ServerStart(void)
 {
 	this->serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->serverSocket == -1) {
+    if (this->serverSocket == -1) 
+    {
         std::cerr << "Error creating socket" << std::endl;
         return ;
     }
@@ -73,17 +74,21 @@ void Server::ServerStart(void)
         return ;
 	}
 
-    while (true) {
+    while (true) 
+    {
         struct epoll_event events[MAX_UTILISATEURS];
         int new_event = epoll_wait(this->epoll_fd, events, MAX_UTILISATEURS, -1);
-        if (new_event == -1) {
+        if (new_event == -1) 
+        {
             perror("epoll_wait");
             return;
         }
 
-        int i = 0;
-        while (i < new_event) {
-            if (events[i].data.fd == serverSocket) {
+    
+        for (int i = 0; i < new_event; ++i)
+        {
+            if (events[i].data.fd == serverSocket) 
+            {
                 // Handle new client connections
                 struct sockaddr_in clientAddress;
                 socklen_t clientAddrLen = sizeof(clientAddress);
@@ -91,32 +96,75 @@ void Server::ServerStart(void)
 
                 if (clientSocket == -1)
                     perror("accept");
-                else {
+                else 
+                {
                     event.events = EPOLLIN;
                     event.data.fd = clientSocket;
-                    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientSocket, &event) == -1) {
+                    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientSocket, &event) == -1)
+                    {
                         perror("epoll_ctl");
                         return;
                     }
-
                     // Store the new client socket in the list
                     this->clientSockets.push_back(clientSocket);
-                }
-            } else {
-                // Handle messages from clients
-                
-                char buffer[512];
-                int bytes_read = read(events[i].data.fd, buffer, sizeof(buffer));
-                if (bytes_read > 0) {
-                    // Broadcast the message to all other connected clients
-                    for (unsigned long j = 0; j < this->clientSockets.size(); ++j) {
-                        if (this->clientSockets[j] != events[i].data.fd) {
-                            write(this->clientSockets[j], buffer, bytes_read);
-                        }
-                    }
+                    User* new_user = new User("user_1", events[i].data.fd);
+                    this->userList.push_back(new_user);
+                    std::cout << "SERVER CONNECTED" << std::endl;
                 }
             }
-            i++;
+            else 
+            {
+                std::cout << "ALREADY CONNECTED" << std::endl;
+
+                // Check for available data to read
+                if (events[i].events & EPOLLIN) 
+                {
+                    char buffer[512];
+                    int bytes_read = read(events[i].data.fd, buffer, sizeof(buffer));
+                    if (bytes_read > 0) 
+                    {
+                        std::string message(buffer, bytes_read);
+
+                        // Handle messages from clients
+                        if (message.find("/Join") == 0) 
+                        {
+                            return ;
+                        } 
+                        else if (message.find("/MSG") == 0) 
+                        {
+                            
+                            // Handle a message
+                            std::string msgContent = message.substr(5); // Extract the message content
+                            User* sender = new User("the sender", events[i].data.fd);
+                            //User* receiver = new User("the receiver", (events[i].data.fd) + 1);
+                            this->userList.push_back(sender);
+                            // (events[i].data.fd);
+                            if (sender) 
+                            {
+                                std::string senderName = sender->GetUserName(); 
+                                std::string response = "You (" + senderName + ") sent a message: " + msgContent;
+
+                                    // Send the response back to the sender
+                                send(events[i].data.fd, response.c_str(), response.length(), 0);
+
+                                    // Broadcast the message to other users if needed
+                                    // Iterate through the user list and send the message to others
+                                std::string message = "carreeeeee";
+                                send(((events[i].data.fd) + 1), message.c_str(), message.length(), 0);
+                                // for (User* user : this->userList)
+                                // {
+                                //     if (user != sender) 
+                                //     {
+                                //         send(user->getSocket(), message.c_str(), message.length(), 0);
+                                //     }
+                                // }
+                            }
+                        }
+                    } 
+                    else 
+                        write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands
+                }
+            }
         }
     }
     close(serverSocket);
@@ -141,7 +189,5 @@ int    Server::SetSocket(unsigned int port)
         close(this->serverSocket);
         return 0;
     }
-    
     return 1;
-
 }

@@ -1,30 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/05 16:19:46 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/12 15:02:13 by tbelleng         ###   ########.fr       */
+/*   Created: 2023/10/12 15:58:09 by tbelleng          #+#    #+#             */
+/*   Updated: 2023/10/12 20:38:44 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../server.hpp"
-#include <iostream>
-#include <cstring>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <map>
+# include "../User.hpp"
 
-int main(int argc, char **argv) 
+User::User(std::string name, int user_fd)
 {
-    (void)argc;
-    (void)argv;
-    
-    Server *irc = new Server();
-    irc->ServerStart();
+	this->nickname = name;
+	this->userFd = user_fd;
+	std::cout << "User Constructor" << std::endl;
+	return ;
+}
 
-    return 0;
+User::~User(void)
+{
+	std::cout << "User Constructor" << std::endl;
+	return ;
+}
+
+std::string User::GetUserName(void)
+{
+	return (this->nickname);
 }

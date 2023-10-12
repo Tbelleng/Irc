@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.hpp                                         :+:      :+:    :+:   */
+/*   User.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/12 18:25:38 by tbelleng         ###   ########.fr       */
+/*   Created: 2023/10/12 16:40:25 by tbelleng          #+#    #+#             */
+/*   Updated: 2023/10/12 20:31:53 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+# ifndef USER_HPP
+# define USER_HPP
 
 # include <algorithm>
 # include <vector>
@@ -25,34 +25,21 @@
 # include <sys/epoll.h>
 # include <arpa/inet.h>
 # include <vector>
-# include "User.hpp"
-# include "Channel.hpp"
 
 
-class Server
+class User
 {
 	private :
 	
-	std::string password;
-	unsigned int port;
-	int serverSocket;
-	int epoll_fd;
-	struct sockaddr_in serverAddress;
-	struct epoll_event event;
-	std::vector<int> clientSockets;
-	std::vector<User*> userList;
-	std::vector<Channel*> channelList;
+	std::string nickname;
+	int userFd;
 	
 	public :
-	
-	Server(void);
-	~Server(void);
-	void ServerStart(void);
-	void SetPort(unsigned int port);
-	int  SetSocket(unsigned int port);
-	
+
+	User(std::string name, int user_fd);
+	~User(void);
+	std::string GetUserName(void); 
 
 };
-
 
 #endif

@@ -1,3 +1,5 @@
 *.o
 ircserv
+obj/
 .vscode/
+test.txt
