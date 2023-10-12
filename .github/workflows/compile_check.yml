@@ -14,6 +14,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@main
 
+    - name: Set TERM environment variable
+      run: | 
+       export TERM=linux
+
     - name: Compile code
       run: |
        make
