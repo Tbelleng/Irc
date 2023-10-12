@@ -2,7 +2,7 @@ NAME = ircserv
 
 SRC_DIR = ./src/
 
-SRCS = $(SRC_DIR)main.cpp	\
+SRCS = $(SRC_DIR)server.cpp $(SRC_DIR)main.cpp
 
 OBJS_DIR = ./obj/
 
@@ -20,7 +20,6 @@ $(OBJS_DIR):
 
 $(OBJS_DIR)%.o: $(SRC_DIR)%.cpp | $(OBJS_DIR)
 	@$(CC) $(CFLAGS) -c $< -o $@
-
 
 $(NAME): $(OBJS)
 	@clear
