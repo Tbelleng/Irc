@@ -107,6 +107,8 @@ int main(int argc, char **argv)
             Channel Channel1("Channel1", tmp, epoll_fd, events[1]);
             Channel1.setMember(tmp);
             Channel1.sendMessage("Hello world\n");
+            Channel1.setTopic(tmp, "re tout le monde\n");
+            Channel1.getTopic();
         }
     }
     close(serverSocket);

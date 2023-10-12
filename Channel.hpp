@@ -9,7 +9,7 @@ private:
     std::string         name;
     int                 epfd;
     struct epoll_event& ev;
-    Topic*               topic;
+    Topic               topic;
 
 public:
     Channel(int opMember, int epfd, struct epoll_event& ev);
@@ -18,7 +18,7 @@ public:
     
     void                setMember(int newMember);
     void                setOpMember(int oldOpMember, int newOpMember);
-    void                setGrade(int Member, bool grade);
+    void                setGrade(int Member, int grade);
     void                setTopic(int Member, std::string topic);
 
     std::string         getTopic(void) const;
