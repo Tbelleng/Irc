@@ -35,7 +35,6 @@ $(OBJS_DIR):
 $(OBJS_DIR)%.o: $(SRC_DIR)%.cpp | $(OBJS_DIR)
 	@$(CXX) $(CXXFLAGS) -MMD -c $< -o $@
 
-
 $(NAME): $(OBJS)
 	@clear
 	@echo "\033[1;34m                                                                                                                     "
