@@ -22,13 +22,13 @@ std::string Channel::getName( void ) const {
 }
 
 std::string Channel::getTopic(void) const {
-    Channel::sendMessage(this->topic.getTopic().c_str());
-    return (this->topic.getTopic());
+    Channel::sendMessage(this->topic->getTopic().c_str());
+    return (this->topic->getTopic());
 }
 
-void    Channel::setGrade(int member, int grade) {
+void    Channel::setGrade(int member, bool grade) {
     if (*find(this->opMember.begin(), this->opMember.end(), member) == member) {
-        this->topic.setGrade(grade);
+        this->topic->setGrade(grade);
     } else {
         _send("Not an op!", member, this->epfd, this->ev);
     }
@@ -36,15 +36,15 @@ void    Channel::setGrade(int member, int grade) {
 }
 
 void    Channel::setTopic(int member, std::string topic) {
-    std::cout << this->topic.getGrade() << std::endl;
-    if (this->topic.getGrade() == 0){
+    if (this->topic->getGrade()){
         if (*find(this->opMember.begin(), this->opMember.end(), member) == member) {
-            this->topic.setTopic(topic);
+            this->topic->setTopic(topic);
         } else {
             _send("Not an op!", member, this->epfd, this->ev);
         }
     } else {
-        this->topic.setTopic(topic);
+        std::cout << "test\n";
+        this->topic->setTopic(topic);
     }
     return ;
 }

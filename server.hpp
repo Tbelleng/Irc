@@ -13,6 +13,9 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+# define DEBUG_CHANNEL 0
+# define DEBUG_TOPIC 0
+
 # include <algorithm>
 # include <vector>
 # include <iostream>
@@ -25,6 +28,9 @@
 # include <sys/epoll.h>
 # include <arpa/inet.h>
 
+# include "Topic.hpp"
+# include "Channel.hpp"
 
+void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 
 #endif
