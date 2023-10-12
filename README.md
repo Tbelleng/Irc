@@ -21,7 +21,7 @@
 
 The IRC (Internet Relay Chat) protocol is for use with text based conferencing; the simplest client being any socket program capable of connecting to the server.
 
-## Run <a name"Run"></a>
+## Run <a name="Run"></a>
 
 Put this cmd in irssi : ```/CONNECT localhost 5500 mdp nom```
 
