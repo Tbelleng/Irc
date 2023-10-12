@@ -1,4 +1,4 @@
-#include "Topic.hpp"
+#include "server.hpp"
 
 Topic::Topic(void) : topic("No topic set!"), grade(false){
     if(DEBUG_TOPIC)
