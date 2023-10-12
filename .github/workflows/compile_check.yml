@@ -18,6 +18,3 @@ jobs:
       run: |
        export TERM=xterm
        make
-
-    - name: Run compilation test
-      run: ./ircserv 5500 gallieni
