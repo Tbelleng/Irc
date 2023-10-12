@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/12 14:32:11 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/12 14:53:58 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,25 @@
 
 int MAX_UTILISATEURS = 10;
 
+//******************************Class Constructor***************************
 Server::Server(void)
 {
 	std::cout << "Server initialized" << std::endl;
 }
 
+
+//******************************Class Destructor***************************
 Server::~Server(void)
 {
 	std::cout << "Server Destroyed" << std::endl;
 }
 
+
+//#This function will init our server as follow :
+//      # Create and Bind the socket to the right port
+//      # Check if there is any error during the connect
+//      # In the loop, listen for any new epoll event like connection
+//          # Or spread message across all clients
 void Server::ServerStart(void)
 {
 	this->serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -113,6 +122,7 @@ void Server::ServerStart(void)
     close(serverSocket);
 }
 
+//**************************** Setters ******************************
 void    Server::SetPort(unsigned int port)
 {
     this->port = port;
@@ -123,7 +133,6 @@ int    Server::SetSocket(unsigned int port)
 {
     this->SetPort(port);
     
-	//struct sockaddr_in serverAddress;
     this->serverAddress.sin_family = AF_INET;
     this->serverAddress.sin_port = htons(this->port);
     this->serverAddress.sin_addr.s_addr = INADDR_ANY;
