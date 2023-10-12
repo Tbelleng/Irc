@@ -65,7 +65,6 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    Channel Channel1("Channel1");
 
     while (true) 
     {
@@ -76,6 +75,7 @@ int main(int argc, char **argv)
             return 0;
         }
         int i = 0;
+        int tmp = 0;
         while (i < new_event)
         {
             if (events[i].data.fd == serverSocket)
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
                     socklen_t clientAddrLen = sizeof(clientAddress);
                     int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &clientAddrLen);
 
-                    Channel1.addMember(clientSocket);
+                    tmp = clientSocket;
                     if (clientSocket == -1)
                         perror("accept");
                     else
@@ -105,7 +105,9 @@ int main(int argc, char **argv)
                 write(events[i].data.fd, buffer, bytes_read);
             }
             i++;
-            Channel1.sendMessage("Hello world", epoll_fd, events[1]);
+            Channel Channel1("Channel1", tmp, epoll_fd, events[1]);
+            Channel1.setMember(tmp);
+            Channel1.sendMessage("Hello world\n");
         }
     }
     close(serverSocket);
