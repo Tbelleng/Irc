@@ -6,7 +6,7 @@
 #    By: luciefer <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/09/17 10:28:54 by luciefer          #+#    #+#              #
-#    Updated: 2023/09/17 10:28:57 by luciefer         ###   ########.fr        #
+#    Updated: 2023/10/12 19:34:02 by hel-kame         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,11 +23,10 @@ OBJS_DIR = ./obj/
 
 OBJS = $(SRCS:$(SRC_DIR)%.cpp=$(OBJS_DIR)%.o)
 DEPS = $(SRCS:$(SRC_DIR)%.cpp=$(OBJS_DIR)%.d)
-INCLUDE = server.hpp Channel.hpp Topic.hpp
-AR = #ar rcs
+INCLUDE = ./include/
 RM = rm -f
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I.
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I$(INCLUDE)
 
 all: $(NAME)
 
