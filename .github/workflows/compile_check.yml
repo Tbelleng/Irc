@@ -15,7 +15,9 @@ jobs:
       uses: actions/checkout@main
 
     - name: Compile code
-      run: make
+      run: |
+       make
 
     - name: Run compilation test
-      run: ./ircserv 5500 gallieni
+      run: |
+       ./ircserv 5500 gallieni
