@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/12 14:09:54 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/12 14:32:11 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,17 +91,18 @@ void Server::ServerStart(void)
                     }
 
                     // Store the new client socket in the list
-                    clientSockets.push_back(clientSocket);
+                    this->clientSockets.push_back(clientSocket);
                 }
             } else {
                 // Handle messages from clients
+                
                 char buffer[512];
                 int bytes_read = read(events[i].data.fd, buffer, sizeof(buffer));
                 if (bytes_read > 0) {
                     // Broadcast the message to all other connected clients
                     for (unsigned long j = 0; j < this->clientSockets.size(); ++j) {
                         if (this->clientSockets[j] != events[i].data.fd) {
-                            write(clientSockets[j], buffer, bytes_read);
+                            write(this->clientSockets[j], buffer, bytes_read);
                         }
                     }
                 }
