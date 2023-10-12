@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 16:19:46 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/10 20:02:25 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/12 10:53:44 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,8 +144,8 @@ int main(int argc, char **argv)
         // }
         //if (false)
         //    close(clientSocket);
-        std::cout << "SERVER EPOLL :" << events[0].data.fd << std::endl;
-        std::cout << "SERVER EPOLL :" << events[1].data.fd << std::endl;
+        // std::cout << "SERVER EPOLL :" << events[0].data.fd << std::endl;
+        // std::cout << "SERVER EPOLL :" << events[1].data.fd << std::endl;
     }
     close(serverSocket);
     return 0;
