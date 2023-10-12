@@ -12,16 +12,13 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@main
+      uses: actions/checkout@v2
 
     - name: Set TERM environment variable
-      run: | 
-       export TERM=linux
+      run: export TERM=xterm
 
     - name: Compile code
-      run: |
-       make
+      run: make
 
     - name: Run compilation test
-      run: |
-       ./ircserv 5500 gallieni
+      run: ./ircserv 5500 gallieni
