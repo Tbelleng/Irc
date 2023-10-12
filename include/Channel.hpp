@@ -4,12 +4,12 @@
 
 class   Channel {
 private:
-    std::vector<int>    member;
-    std::vector<int>    opMember;
-    std::string         name;
-    int                 epfd;
-    struct epoll_event& ev;
-    Topic               topic;
+    std::vector<int>    _members;
+    std::vector<int>    _opMembers;
+    std::string         _name;
+    int                 _epfd;
+    struct epoll_event& _ev;
+    Topic               _topic;
 
 public:
     Channel(int opMember, int epfd, struct epoll_event& ev);
@@ -26,8 +26,8 @@ public:
     std::vector<int>    getAllMember( void ) const;
     std::vector<int>    getAllOpMember( void ) const;
 
-    void                suppMember(int suppMember);
-    void                suppOpMember(int oldOpMember, int suppOpMember);
+    void                suppMember(int opMember, int suppMember);
+    void                suppOpMember(int opMember, int suppOpMember);
 
-    int                 sendMessage(const char* message) const;
+    void                 sendMessage(const char* message) const;
 };
