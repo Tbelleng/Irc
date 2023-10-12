@@ -16,13 +16,14 @@ SRC_DIR = ./src/
 
 SRCS = $(SRC_DIR)main.cpp	\
 	   $(SRC_DIR)Channel.cpp	\
-	   $(SRC_DIR)utils.cpp	
+	   $(SRC_DIR)utils.cpp		\
+	   $(SRC_DIR)Topic.cpp	
 
 OBJS_DIR = ./obj/
 
 OBJS = $(SRCS:$(SRC_DIR)%.cpp=$(OBJS_DIR)%.o)
 DEPS = $(SRCS:$(SRC_DIR)%.cpp=$(OBJS_DIR)%.d)
-INCLUDE = server.hpp Channel.hpp 
+INCLUDE = server.hpp Channel.hpp Topic.hpp
 AR = #ar rcs
 RM = rm -f
 CXX = c++

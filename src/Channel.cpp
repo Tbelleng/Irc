@@ -1,12 +1,12 @@
 #include "Channel.hpp"
 
-Channel::Channel(int opMember, int epfd, struct epoll_event& ev) : name("Default"), epfd(epfd), ev(ev) {
+Channel::Channel(int opMember, int epfd, struct epoll_event& ev) : name("Default"), epfd(epfd), ev(ev), topic() {
     this->opMember.push_back(opMember);
     if (DEBUG_CHANNEL)
         std::cout << "# Default Channel constructor call #" << std::endl;
 }
 
-Channel::Channel(std::string name, int opMember, int epfd, struct epoll_event& ev) : name(name), epfd(epfd), ev(ev) {
+Channel::Channel(std::string name, int opMember, int epfd, struct epoll_event& ev) : name(name), epfd(epfd), ev(ev), topic() {
     this->opMember.push_back(opMember);
     if (DEBUG_CHANNEL)
         std::cout << "# String Channel constructor call #" << std::endl;
@@ -21,7 +21,31 @@ std::string Channel::getName( void ) const {
     return this->name;
 }
 
+std::string Channel::getTopic(void) const {
+    return (this->topic->getTopic());
+}
 
+void    Channel::setGrade(int member, bool grade) {
+    if (*find(this->opMember.begin(), this->opMember.end(), member) == member) {
+        this->topic->setGrade(grade);
+    } else {
+        _send("Not an op!", member, this->epfd, this->ev);
+    }
+    return ;
+}
+
+void    Channel::setTopic(int member, std::string topic) {
+    if (this->topic->getGrade()){
+        if (*find(this->opMember.begin(), this->opMember.end(), member) == member) {
+            this->topic->setTopic(topic);
+        } else {
+            _send("Not an op!", member, this->epfd, this->ev);
+        }
+    } else {
+        this->topic->setTopic(topic);
+    }
+    return ;
+}
 
 void    Channel::setMember(int newMember) {
     this->member.push_back(newMember);
@@ -65,8 +89,8 @@ std::vector<int> Channel::getAllMember( void ) const {
 
 int     Channel::sendMessage(const char* message) const {
 
-  for(std::vector<int>::const_iterator it = member.begin(); it != member.end(); ++it) {
-       _send(message, *it, this->epfd, this->ev); 
+    for(std::vector<int>::const_iterator it = member.begin(); it != member.end(); ++it) {
+        _send(message, *it, this->epfd, this->ev); 
     }
     return 1;
 }

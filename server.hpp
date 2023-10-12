@@ -28,6 +28,9 @@
 # include <sys/epoll.h>
 # include <arpa/inet.h>
 
+# include "Channel.hpp"
+# include "Topic.hpp"
+
 void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 
 #endif

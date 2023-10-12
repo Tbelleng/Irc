@@ -10,8 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "server.hpp"
-# include "Channel.hpp" 
+#include "server.hpp"
 
 int MAX_UTILISATEURS = 5;
 
