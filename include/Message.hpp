@@ -17,4 +17,4 @@ public:
     std::string getMessage(void) const;
     Channel     getChannel(void) const;
     User        getSender(void) const;
-}
+};

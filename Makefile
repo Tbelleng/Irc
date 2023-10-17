@@ -1,21 +1,11 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: luciefer <marvin@42.fr>                    +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/09/17 10:28:54 by luciefer          #+#    #+#              #
-#    Updated: 2023/10/12 19:34:02 by hel-kame         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME = ircserv
 
 SRC_DIR = ./src/
 
 SRCS = $(SRC_DIR)main.cpp	\
 	   $(SRC_DIR)Channel.cpp	\
+	   $(SRC_DIR)server.cpp	\
+	   $(SRC_DIR)User.cpp	\
 	   $(SRC_DIR)utils.cpp		\
 	   $(SRC_DIR)Topic.cpp	
 
