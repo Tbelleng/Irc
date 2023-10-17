@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/12 18:25:38 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/17 15:46:49 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ class Server
 	void ServerStart(void);
 	void SetPort(unsigned int port);
 	int  SetSocket(unsigned int port);
+	void ServerRun(void);
 	
 
 };

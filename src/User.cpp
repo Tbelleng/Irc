@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/12 15:58:09 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/12 20:38:44 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/17 15:05:03 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,14 @@ User::~User(void)
 	return ;
 }
 
+
 std::string User::GetUserName(void)
 {
 	return (this->nickname);
+}
+
+void User::ChangeNickname(std::string new_nickname)
+{
+	this->nickname = new_nickname;
+	return ;
 }

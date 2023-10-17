@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/12 20:51:44 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/17 16:26:59 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,13 @@ void Server::ServerStart(void)
         close(this->serverSocket);
         return ;
 	}
+	
+	this->ServerRun();
+	return ;
+}
 
+void Server::ServerRun(void)
+{
     while (true) 
     {
         struct epoll_event events[MAX_UTILISATEURS];
@@ -83,11 +89,18 @@ void Server::ServerStart(void)
             perror("epoll_wait");
             return;
         }
-
     
         for (int i = 0; i < new_event; ++i)
         {
-            if (events[i].data.fd == serverSocket) 
+            if (events[i].events & (EPOLLERR | EPOLLHUP)) {
+                std::cout << "Client disconnected" << std::endl;
+                //iterer dans la liste de user et le vecteur de socket pour effacer User et son fd
+                close(events[i].data.fd);  // Close the socket
+
+                // Remove the disconnected socket from your data structures
+                // (e.g., clientSockets and userList)
+            }
+            else if (events[i].data.fd == serverSocket) 
             {
                 // Handle new client connections
                 struct sockaddr_in clientAddress;
@@ -115,55 +128,53 @@ void Server::ServerStart(void)
             else 
             {
                 std::cout << "ALREADY CONNECTED" << std::endl;
-
+                
                 // Check for available data to read
-                if (events[i].events & EPOLLIN) 
+                std::string response = "SERVER SEND YOU A MESSAGE";
+                char buffer[512];
+                int bytes_read = recv(events[i].data.fd, buffer, sizeof(buffer), 0);
+                std::cout << "BUFFER = " << buffer << std::endl;
+                //send(events[i].data.fd, response.c_str(), response.length(), 0);
+                if (bytes_read > 0) 
                 {
-                    char buffer[512];
-                    int bytes_read = read(events[i].data.fd, buffer, sizeof(buffer));
-                    if (bytes_read > 0) 
-                    {
-                        std::string message(buffer, bytes_read);
+                    std::string message(buffer, bytes_read);
 
                         // Handle messages from clients
-                        if (message.find("/Join") == 0) 
-                        {
-                            return ;
-                        } 
-                        else if (message.find("/MSG") == 0) 
-                        {
-                            
-                            // Handle a message
-                            std::string msgContent = message.substr(5); // Extract the message content
-                            User* sender = new User("the sender", events[i].data.fd);
-                            //User* receiver = new User("the receiver", (events[i].data.fd) + 1);
-                            this->userList.push_back(sender);
+                    if (message.find("JOIN") == 0) 
+                    {
+                        std::cout << "CHANNEL CREATED" << std::endl;
+                        return ;
+                    }
+                    
+                    // if (message.find("/cmd") != std::string::npos) {
+                    // // Respond to the "/cmd" command
+                    //     std::string response = "Command received: " + message;
+                    //     send(events[i].data.fd, response.c_str(), response.length(), 0);
+                    // }
+                    
+                    else if (message.find("MSG") == 0) 
+                    {
+                        // Handle a message
+                        std::string msgContent = message.substr(5); // Extract the message content
+                        User* sender = new User("the sender", events[i].data.fd);
+                        //User* receiver = new User("the receiver", (events[i].data.fd) + 1);
+                        this->userList.push_back(sender);
                             // (events[i].data.fd);
-                            if (sender) 
-                            {
-                                std::string senderName = sender->GetUserName(); 
-                                std::string response = "You (" + senderName + ") sent a message: " + msgContent;
-
+                        if (sender) 
+                        {
+                            std::string senderName = sender->GetUserName(); 
+                            std::string response = "You, (" + senderName + ") sent a message: " + msgContent;
                                     // Send the response back to the sender
-                                send(events[i].data.fd, response.c_str(), response.length(), 0);
-
+                            send(events[i].data.fd, response.c_str(), response.length(), 0);
                                     // Broadcast the message to other users if needed
                                     // Iterate through the user list and send the message to others
-                                std::string message = "carreeeeee";
-                                send(((events[i].data.fd) + 1), message.c_str(), message.length(), 0);
-                                // for (User* user : this->userList)
-                                // {
-                                //     if (user != sender) 
-                                //     {
-                                //         send(user->getSocket(), message.c_str(), message.length(), 0);
-                                //     }
-                                // }
-                            }
+                            std::string message = "carreeeeee";
+                            send(((events[i].data.fd) + 1), message.c_str(), message.length(), 0);
                         }
-                    } 
-                    else 
-                        write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands
-                }
+                    }
+                } 
+                else 
+                    write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands
             }
         }
     }
