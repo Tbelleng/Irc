@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 16:26:59 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/17 17:06:36 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,10 @@
 int MAX_UTILISATEURS = 10;
 
 //******************************Class Constructor***************************
-Server::Server(void)
+Server::Server(int port, std::string password)
 {
+    this->port = port;
+    this->password = password;
 	std::cout << "Server initialized" << std::endl;
 }
 
@@ -43,7 +45,7 @@ void Server::ServerStart(void)
         return ;
     }
     
-    if (!this->SetSocket(5500))
+    if (!this->SetSocket(this->port))
         return ;
 
     this->epoll_fd = epoll_create(1);
@@ -64,7 +66,7 @@ void Server::ServerStart(void)
         return ;
     }
 
-    std::cout << "Server listening on port 5500..." << std::endl;
+    std::cout << "Server listening on port " << this->port << std::endl;
 	
 	if (epoll_ctl(this->epoll_fd, EPOLL_CTL_ADD, this->serverSocket, &this->event) == -1) 
 	{
@@ -128,11 +130,11 @@ void Server::ServerRun(void)
             else 
             {
                 std::cout << "ALREADY CONNECTED" << std::endl;
-                
-                // Check for available data to read
+
                 std::string response = "SERVER SEND YOU A MESSAGE";
                 char buffer[512];
                 int bytes_read = recv(events[i].data.fd, buffer, sizeof(buffer), 0);
+                buffer[bytes_read] = '\0';
                 std::cout << "BUFFER = " << buffer << std::endl;
                 //send(events[i].data.fd, response.c_str(), response.length(), 0);
                 if (bytes_read > 0) 
