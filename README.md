@@ -27,4 +27,5 @@ Put this cmd in irssi : ```/CONNECT localhost 5500 mdp nom```
 
 ## Ressources <a name="ressources"></a>
 RFC 1459: https://datatracker.ietf.org/doc/html/rfc1459#page-7
+
 all CMD: https://muddy-tadpole-89a.notion.site/3d9eb38a40d04fec8888c138c32a4ff3?v=5f5a0a1c611a4eaea5c9c33f05aeba51&pvs=4
