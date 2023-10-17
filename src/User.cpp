@@ -6,11 +6,11 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/12 15:58:09 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 15:05:03 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/17 18:31:42 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../User.hpp"
+# include "User.hpp"
 
 User::User(std::string name, int user_fd)
 {

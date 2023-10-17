@@ -6,15 +6,19 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 16:48:45 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/17 17:44:47 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+# define DEBUG_CHANNEL 0
+# define DEBUG_TOPIC 0
+
 # include <algorithm>
 # include <vector>
+# include <map>
 # include <iostream>
 # include <fcntl.h>
 # include <cstring>
@@ -26,8 +30,8 @@
 # include <arpa/inet.h>
 # include <vector>
 # include "User.hpp"
+# include "Topic.hpp"
 # include "Channel.hpp"
-
 
 class Server
 {
@@ -40,8 +44,8 @@ class Server
 	struct sockaddr_in serverAddress;
 	struct epoll_event event;
 	std::vector<int> clientSockets;
-	std::vector<User*> userList;
-	std::vector<Channel*> channelList;
+	//std::vector<User*> userList;
+	//std::vector<Channel*> channelList;
 	
 	public :
 	
@@ -55,5 +59,6 @@ class Server
 
 };
 
+void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 
 #endif

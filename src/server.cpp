@@ -6,12 +6,11 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 17:06:36 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/17 18:41:06 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../server.hpp"
-# include <vector>
+# include "server.hpp"
 
 int MAX_UTILISATEURS = 10;
 
@@ -121,9 +120,9 @@ void Server::ServerRun(void)
                         return;
                     }
                     // Store the new client socket in the list
-                    this->clientSockets.push_back(clientSocket);
-                    User* new_user = new User("user_1", events[i].data.fd);
-                    this->userList.push_back(new_user);
+                    // this->clientSockets.push_back(clientSocket);
+                    // User* new_user = new User("user_1", events[i].data.fd);
+                    // this->userList.push_back(new_user);
                     std::cout << "SERVER CONNECTED" << std::endl;
                 }
             }
@@ -160,7 +159,7 @@ void Server::ServerRun(void)
                         std::string msgContent = message.substr(5); // Extract the message content
                         User* sender = new User("the sender", events[i].data.fd);
                         //User* receiver = new User("the receiver", (events[i].data.fd) + 1);
-                        this->userList.push_back(sender);
+                        // this->userList.push_back(sender);
                             // (events[i].data.fd);
                         if (sender) 
                         {
@@ -177,6 +176,8 @@ void Server::ServerRun(void)
                 } 
                 else 
                     write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands
+                std::string responsed = "001\r\n";
+                send(events[i].data.fd, responsed.c_str(), responsed.size(), 0);
             }
         }
     }

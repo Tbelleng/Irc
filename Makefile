@@ -2,19 +2,21 @@ NAME = ircserv
 
 SRC_DIR = ./src/
 
-SRCS =  $(SRC_DIR)server.cpp \
-			$(SRC_DIR)Channel.cpp \
-			$(SRC_DIR)User.cpp \
-	        $(SRC_DIR)main.cpp \
+SRCS = $(SRC_DIR)main.cpp	\
+	   $(SRC_DIR)Channel.cpp	\
+	   $(SRC_DIR)server.cpp	\
+	   $(SRC_DIR)User.cpp	\
+	   $(SRC_DIR)utils.cpp		\
+	   $(SRC_DIR)Topic.cpp	
 
 OBJS_DIR = ./obj/
 
 OBJS = $(SRCS:$(SRC_DIR)%.cpp=$(OBJS_DIR)%.o)
-INCLUDE = server.hpp Channel.hpp User.hpp
-AR = #ar rcs
+DEPS = $(SRCS:$(SRC_DIR)%.cpp=$(OBJS_DIR)%.d)
+INCLUDE = ./include/
 RM = rm -f
-CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+CXX = c++
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I$(INCLUDE)
 
 all: $(NAME)
 
@@ -22,13 +24,15 @@ $(OBJS_DIR):
 	@mkdir -p $(OBJS_DIR)
 
 $(OBJS_DIR)%.o: $(SRC_DIR)%.cpp | $(OBJS_DIR)
-	@$(CC) $(CFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -MMD -c $< -o $@
 
 $(NAME): $(OBJS)
 	@clear
+	@echo "\033[1;34m                                                                                                                     "
+	@echo "    Loading quantum version..."
 	@echo "Project name: $(NAME)"
 	@echo "\n\033[1;32mCompilation... ⌛\033[0;m\n"
-	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
 	@echo -n "\r 5%  [\033[0;31m█\033[m.........................]"
 	@sleep 0.01
 	@echo -n "\r 10%  [\033[0;31m███\033[m.......................]"
@@ -58,19 +62,6 @@ $(NAME): $(OBJS)
 	@echo -n "\r 99%  [\033[0;31m██████████████████████████\033[m]"
 	@sleep 1
 	@echo -n "\r 100% [\033[0;32m██████████████████████████\033[m]\033[0;32m compilation finished ✓\n\033[0;m"
-
-clean:
-	@echo "\033[1;1;32m♻️  Objects have been \033[5;1;31mdeleted\033[m ♻️"
-	@$(RM) -r $(OBJS_DIR)
-
-fclean:
-	@$(RM) $(NAME)
-	@echo -n "\033[0;31m⠀"
-	@echo "[##############]"
-	@echo "\033[1;1;32m♻️  Objects and $(NAME) have been \033[5;1;31mdeleted\033[m ♻️"
-	@$(RM) -r $(OBJS_DIR)
-
-re:	fclean all
 
 -include $(DEPS)
 

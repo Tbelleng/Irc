@@ -3,3 +3,4 @@ ircserv
 obj/
 .vscode/
 test.txt
+.github/
