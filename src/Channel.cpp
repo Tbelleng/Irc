@@ -1,4 +1,4 @@
-#include "Channel.hpp"
+#include "server.hpp"
 
 Channel::Channel(int opMember, int epfd, struct epoll_event& ev) : _name("Default"), _epfd(epfd), _ev(ev), _topic() {
     this->_opMembers.push_back(opMember);

@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 18:41:06 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/19 21:22:01 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,16 @@ void Server::ServerStart(void)
 	return ;
 }
 
+void    Server::ShowUserList(std::vector<User*> userList)
+{
+    for (std::vector<User*>::const_iterator it = userList.begin(); it != userList.end(); ++it)
+    {
+        const User* user = *it;
+        // Access the nickname of each user and print it
+        std::cout << "User Nickname: " << user->GetUserName() << std::endl;
+    }
+}
+
 void Server::ServerRun(void)
 {
     while (true) 
@@ -90,7 +100,7 @@ void Server::ServerRun(void)
             perror("epoll_wait");
             return;
         }
-    
+
         for (int i = 0; i < new_event; ++i)
         {
             if (events[i].events & (EPOLLERR | EPOLLHUP)) {
@@ -120,22 +130,46 @@ void Server::ServerRun(void)
                         return;
                     }
                     // Store the new client socket in the list
-                    // this->clientSockets.push_back(clientSocket);
-                    // User* new_user = new User("user_1", events[i].data.fd);
+                    this->clientSockets.push_back(clientSocket);
+                    std::cout << "New Connection to the server...listenning..." << std::endl;
+                    // User* new_user = new User("user_1", clientSocket);
                     // this->userList.push_back(new_user);
-                    std::cout << "SERVER CONNECTED" << std::endl;
+
+                    //Now we are gonna store New User infos
+                    // char buffer[512];
+                    // ssize_t bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+                    // std::cout << "NEW CONNECTION BUFFER = " << buffer << std::endl;
+
+                    // if (bytesRead > 0)
+                    // {
+                    //     std::string message(buffer, bytesRead);
+                    //     // Check for "CAP LS" and "pass:<user_mdp>"
+                    //     if (message.find("CAP LS") != std::string::npos)
+                    //     {
+                    //         // Handle CAP LS message
+                    //         std::cout << "CAP LS FINDED" << std::endl;
+                    //     }
+                    //     if (message.find("PASS") != std::string::npos)
+                    //     {
+                    //         // Extract and store the password
+                    //         std::cout << "PASS FINDED" << std::endl;
+                    //         //std::string password = message.substr(message.find("pass:") + 5);
+                    //         //new_user->setPassword(password);
+                    //     }
+                    //     User* new_user = new User(message, clientSocket);
+                    //     this->userList.push_back(new_user);
+                    // }
+                    // this->ShowUserList(this->userList);
+                    // std::string responsed = "001\r\n";
+                    // send(clientSocket, responsed.c_str(), responsed.size(), 0);
                 }
             }
             else 
             {
-                std::cout << "ALREADY CONNECTED" << std::endl;
 
-                std::string response = "SERVER SEND YOU A MESSAGE";
                 char buffer[512];
                 int bytes_read = recv(events[i].data.fd, buffer, sizeof(buffer), 0);
                 buffer[bytes_read] = '\0';
-                std::cout << "BUFFER = " << buffer << std::endl;
-                //send(events[i].data.fd, response.c_str(), response.length(), 0);
                 if (bytes_read > 0) 
                 {
                     std::string message(buffer, bytes_read);
@@ -143,6 +177,8 @@ void Server::ServerRun(void)
                         // Handle messages from clients
                     if (message.find("JOIN") == 0) 
                     {
+                        std::string channel_title  = message.substr(5);
+                        send(events[i].data.fd, channel_title.c_str(), channel_title.size(), 0);
                         std::cout << "CHANNEL CREATED" << std::endl;
                         return ;
                     }
@@ -153,26 +189,26 @@ void Server::ServerRun(void)
                     //     send(events[i].data.fd, response.c_str(), response.length(), 0);
                     // }
                     
-                    else if (message.find("MSG") == 0) 
-                    {
-                        // Handle a message
-                        std::string msgContent = message.substr(5); // Extract the message content
-                        User* sender = new User("the sender", events[i].data.fd);
-                        //User* receiver = new User("the receiver", (events[i].data.fd) + 1);
-                        // this->userList.push_back(sender);
-                            // (events[i].data.fd);
-                        if (sender) 
-                        {
-                            std::string senderName = sender->GetUserName(); 
-                            std::string response = "You, (" + senderName + ") sent a message: " + msgContent;
-                                    // Send the response back to the sender
-                            send(events[i].data.fd, response.c_str(), response.length(), 0);
-                                    // Broadcast the message to other users if needed
-                                    // Iterate through the user list and send the message to others
-                            std::string message = "carreeeeee";
-                            send(((events[i].data.fd) + 1), message.c_str(), message.length(), 0);
-                        }
-                    }
+                    // else if (message.find("MSG") == 0) 
+                    // {
+                    //     // Handle a message
+                    //     std::string msgContent = message.substr(5); // Extract the message content
+                    //     User* sender = new User("the sender", events[i].data.fd);
+                    //     //User* receiver = new User("the receiver", (events[i].data.fd) + 1);
+                    //     // this->userList.push_back(sender);
+                    //         // (events[i].data.fd);
+                    //     if (sender) 
+                    //     {
+                    //         std::string senderName = sender->GetUserName(); 
+                    //         std::string response = "You, (" + senderName + ") sent a message: " + msgContent;
+                    //                 // Send the response back to the sender
+                    //         send(events[i].data.fd, response.c_str(), response.length(), 0);
+                    //                 // Broadcast the message to other users if needed
+                    //                 // Iterate through the user list and send the message to others
+                    //         std::string message = "carreeeeee";
+                    //         send(((events[i].data.fd) + 1), message.c_str(), message.length(), 0);
+                    //     }
+                    // }
                 } 
                 else 
                     write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands

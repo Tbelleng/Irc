@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 17:44:47 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/19 17:06:36 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <iostream>
 # include <fcntl.h>
 # include <cstring>
+# include <sstream>
 # include <stdio.h>
 # include <unistd.h>
 # include <sys/types.h>
@@ -29,9 +30,9 @@
 # include <sys/epoll.h>
 # include <arpa/inet.h>
 # include <vector>
-# include "User.hpp"
 # include "Topic.hpp"
 # include "Channel.hpp"
+# include "User.hpp"
 
 class Server
 {
@@ -44,7 +45,7 @@ class Server
 	struct sockaddr_in serverAddress;
 	struct epoll_event event;
 	std::vector<int> clientSockets;
-	//std::vector<User*> userList;
+	std::vector<User*> userList;
 	//std::vector<Channel*> channelList;
 	
 	public :
@@ -55,6 +56,7 @@ class Server
 	void SetPort(unsigned int port);
 	int  SetSocket(unsigned int port);
 	void ServerRun(void);
+	void ShowUserList(std::vector<User*> userList);
 	
 
 };
