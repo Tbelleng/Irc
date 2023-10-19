@@ -38,6 +38,6 @@ void User::ChangeNickname(std::string new_nickname)
 	return ;
 }
 
-int    User::getUser(void) const{
+int    User::getFd(void) const{
     return this->userFd;
 }

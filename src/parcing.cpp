@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "irc.hpp"
 
 std::vector<std::string>    copyAllCmd(void) {
     std::vector<std::string>    cmd;
@@ -38,5 +38,6 @@ bool    _parcing(std::string buffer, int socket_client) {
     User*    sender = getUser(socket_client);
 
     if (sender == 0)
-        return (NULL);
+        return (0);
+    return 1;
 }
