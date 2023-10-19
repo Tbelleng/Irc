@@ -13,25 +13,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-# define DEBUG_CHANNEL 0
-# define DEBUG_TOPIC 0
-
-# include <algorithm>
-# include <vector>
-# include <map>
-# include <iostream>
-# include <fcntl.h>
-# include <cstring>
-# include <stdio.h>
-# include <unistd.h>
-# include <sys/types.h>
-# include <sys/socket.h>
-# include <sys/epoll.h>
-# include <arpa/inet.h>
-# include <vector>
-# include "User.hpp"
-# include "Topic.hpp"
-# include "Channel.hpp"
+# include "irc.hpp"
 
 class Server
 {
@@ -58,7 +40,5 @@ class Server
 	
 
 };
-
-void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 
 #endif

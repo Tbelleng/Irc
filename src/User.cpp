@@ -27,7 +27,7 @@ User::~User(void)
 }
 
 
-std::string User::GetUserName(void)
+std::string User::GetUserName(void) const
 {
 	return (this->nickname);
 }
@@ -36,4 +36,8 @@ void User::ChangeNickname(std::string new_nickname)
 {
 	this->nickname = new_nickname;
 	return ;
+}
+
+int    User::getUser(void) const{
+    return this->userFd;
 }
