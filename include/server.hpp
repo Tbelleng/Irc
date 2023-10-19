@@ -60,5 +60,6 @@ class Server
 };
 
 void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
+std::vector<std::string>    ft_split(std::string s1, const char token);
 
 #endif
