@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/20 18:12:15 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/20 18:16:12 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,6 @@ int Server::ClientCheck(int user_fd)
 {
     if (userList.empty())
     {
-        std::cout << "User not Found ! Gonna add to the list" << std::endl;
         return 0;
     }
     
@@ -213,11 +212,9 @@ int Server::ClientCheck(int user_fd)
     {
         if ((*it)->GetUserFd() == user_fd)
         {
-            std::cout << "User Found in the User list! " << std::endl;
             return 1;
         }
     }
-    std::cout << "User not Found ! Gonna add to the list" << std::endl;
     return 0;
 }
 
@@ -234,12 +231,10 @@ void Server::GetUserInfo(int user_fd, std::string& buffer)
         if (line.find("PASS ") == 0) 
         {
             password = line.substr(5);
-            std::cout << "PASS "  << password << std::endl;
         } 
         else if (line.find("NICK ") == 0)
         {
             nickname = line.substr(5);
-            std::cout << "NICK "  << nickname << std::endl;
         } 
         else if (line.find("USER ") == 0)
         {
@@ -249,7 +244,6 @@ void Server::GetUserInfo(int user_fd, std::string& buffer)
             startPos = endPos + 1;
             endPos = line.find(" ", startPos);
             std::string hostname = line.substr(startPos, endPos - startPos);
-            std::cout << "USERNAME "  << username << std::endl;
         }
         User* newUser = new User(nickname, password, username, user_fd);
         this->userList.push_back(newUser);
