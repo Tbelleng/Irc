@@ -46,9 +46,8 @@ void User::ChangeNickname(std::string new_nickname)
 	return ;
 }
 
+
 int User::GetUserFd()
 {
     return (this->userFd);
 }
-
-

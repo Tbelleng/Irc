@@ -37,6 +37,8 @@
 # include "Topic.hpp"
 # include "Channel.hpp"
 # include "User.hpp"
+# include "irc.hpp"
+
 
 class Server
 {
@@ -67,6 +69,9 @@ class Server
 
 };
 
+
+bool    _parcing(std::string buffer, int socket_client);
+//User&   getUser(int socket_client);
 void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 
 #endif
