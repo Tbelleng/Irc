@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/20 18:16:12 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/20 18:48:46 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,7 +245,7 @@ void Server::GetUserInfo(int user_fd, std::string& buffer)
             endPos = line.find(" ", startPos);
             std::string hostname = line.substr(startPos, endPos - startPos);
         }
-        User* newUser = new User(nickname, password, username, user_fd);
-        this->userList.push_back(newUser);
     }
+    User* newUser = new User(nickname, password, username, user_fd);
+    this->userList.push_back(newUser);
 }
