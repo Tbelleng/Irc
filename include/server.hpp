@@ -6,14 +6,39 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 17:44:47 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/20 17:31:03 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+# define DEBUG_CHANNEL 0
+# define DEBUG_TOPIC 0
+
+# include <algorithm>
+# include <vector>
+# include <map>
+# include <iostream>
+# include <fcntl.h>
+# include <cstring>
+# include <sstream>
+# include <stdio.h>
+# include <iomanip>
+# include <errno.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <sys/epoll.h>
+# include <arpa/inet.h>
+# include <netinet/in.h> 
+# include <vector>
+# include "Topic.hpp"
+# include "Channel.hpp"
+# include "User.hpp"
 # include "irc.hpp"
+
 
 class Server
 {
@@ -26,7 +51,7 @@ class Server
 	struct sockaddr_in serverAddress;
 	struct epoll_event event;
 	std::vector<int> clientSockets;
-	//std::vector<User*> userList;
+	std::vector<User*> userList;
 	//std::vector<Channel*> channelList;
 	
 	public :
@@ -37,7 +62,10 @@ class Server
 	void SetPort(unsigned int port);
 	int  SetSocket(unsigned int port);
 	void ServerRun(void);
-	
+	void ShowUserList(std::vector<User*> userList);
+	int AddingNewClient(int epoll_fd, struct epoll_event* events);
+	int ClientCheck(int user_fd);
+	void GetUserInfo(int user_fd, std::string& buffer);
 
 };
 

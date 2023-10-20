@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 18:41:06 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/20 18:16:12 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,16 @@ void Server::ServerStart(void)
 	return ;
 }
 
+void    Server::ShowUserList(std::vector<User*> userList)
+{
+    for (std::vector<User*>::const_iterator it = userList.begin(); it != userList.end(); ++it)
+    {
+        const User* user = *it;
+        // Access the nickname of each user and print it
+        std::cout << "User Nickname: " << user->GetUserName() << std::endl;
+    }
+}
+
 void Server::ServerRun(void)
 {
     while (true) 
@@ -90,52 +100,30 @@ void Server::ServerRun(void)
             perror("epoll_wait");
             return;
         }
-    
+
         for (int i = 0; i < new_event; ++i)
         {
             if (events[i].events & (EPOLLERR | EPOLLHUP)) {
                 std::cout << "Client disconnected" << std::endl;
                 //iterer dans la liste de user et le vecteur de socket pour effacer User et son fd
                 close(events[i].data.fd);  // Close the socket
-
-                // Remove the disconnected socket from your data structures
-                // (e.g., clientSockets and userList)
+                // Remove the disconnected socket from  data
             }
-            else if (events[i].data.fd == serverSocket) 
+            else if (events[i].data.fd == serverSocket) //New Connection
             {
-                // Handle new client connections
-                struct sockaddr_in clientAddress;
-                socklen_t clientAddrLen = sizeof(clientAddress);
-                int clientSocket = accept(this->serverSocket, (struct sockaddr*)&clientAddress, &clientAddrLen);
-
-                if (clientSocket == -1)
-                    perror("accept");
-                else 
-                {
-                    event.events = EPOLLIN;
-                    event.data.fd = clientSocket;
-                    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientSocket, &event) == -1)
-                    {
-                        perror("epoll_ctl");
-                        return;
-                    }
-                    // Store the new client socket in the list
-                    // this->clientSockets.push_back(clientSocket);
-                    // User* new_user = new User("user_1", events[i].data.fd);
-                    // this->userList.push_back(new_user);
-                    std::cout << "SERVER CONNECTED" << std::endl;
-                }
+                this->AddingNewClient(epoll_fd, events);
             }
-            else 
+            else //Client already connected sending data
             {
-                std::cout << "ALREADY CONNECTED" << std::endl;
-
-                std::string response = "SERVER SEND YOU A MESSAGE";
+                //check if this fd exist within users
                 char buffer[512];
                 int bytes_read = recv(events[i].data.fd, buffer, sizeof(buffer), 0);
-                buffer[bytes_read] = '\0';
-                std::cout << "BUFFER = " << buffer << std::endl;
-                //send(events[i].data.fd, response.c_str(), response.length(), 0);
+                std::string message(buffer, bytes_read);
+                
+                if (this->ClientCheck(events[i].data.fd) == 0)
+                {
+                    this->GetUserInfo(events[i].data.fd, message);
+                }
                 if (bytes_read > 0) 
                 {
                     std::string message(buffer, bytes_read);
@@ -143,35 +131,10 @@ void Server::ServerRun(void)
                         // Handle messages from clients
                     if (message.find("JOIN") == 0) 
                     {
+                        std::string channel_title  = message.substr(5);
+                        send(events[i].data.fd, channel_title.c_str(), channel_title.size(), 0);
                         std::cout << "CHANNEL CREATED" << std::endl;
                         return ;
-                    }
-                    
-                    // if (message.find("/cmd") != std::string::npos) {
-                    // // Respond to the "/cmd" command
-                    //     std::string response = "Command received: " + message;
-                    //     send(events[i].data.fd, response.c_str(), response.length(), 0);
-                    // }
-                    
-                    else if (message.find("MSG") == 0) 
-                    {
-                        // Handle a message
-                        std::string msgContent = message.substr(5); // Extract the message content
-                        User* sender = new User("the sender", events[i].data.fd);
-                        //User* receiver = new User("the receiver", (events[i].data.fd) + 1);
-                        // this->userList.push_back(sender);
-                            // (events[i].data.fd);
-                        if (sender) 
-                        {
-                            std::string senderName = sender->GetUserName(); 
-                            std::string response = "You, (" + senderName + ") sent a message: " + msgContent;
-                                    // Send the response back to the sender
-                            send(events[i].data.fd, response.c_str(), response.length(), 0);
-                                    // Broadcast the message to other users if needed
-                                    // Iterate through the user list and send the message to others
-                            std::string message = "carreeeeee";
-                            send(((events[i].data.fd) + 1), message.c_str(), message.length(), 0);
-                        }
                     }
                 } 
                 else 
@@ -204,4 +167,85 @@ int    Server::SetSocket(unsigned int port)
         return 0;
     }
     return 1;
+}
+
+//************************************Clients Manager**************************
+
+int    Server::AddingNewClient(int epoll_fd, struct epoll_event* )
+{
+    struct sockaddr_in clientAddress;
+    socklen_t clientAddrLen = sizeof(clientAddress);
+    int clientSocket = accept(this->serverSocket, (struct sockaddr*)&clientAddress, &clientAddrLen);
+
+    if (clientSocket == -1)
+    {
+        if (errno != EWOULDBLOCK)
+        {
+            perror("accept");
+            return -1;
+        }
+    }
+    
+    event.events = EPOLLIN;
+    event.data.fd = clientSocket;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientSocket, &event) == -1)
+    {
+        perror("epoll_ctl");
+        return -1;
+    }
+    clientSockets.push_back(clientSocket);
+    std::cout << "New Client Added ! listenning..." << std::endl;
+    
+    return 0;
+}
+
+//*********************************Users Manager*************************
+
+int Server::ClientCheck(int user_fd)
+{
+    if (userList.empty())
+    {
+        return 0;
+    }
+    
+    for (std::vector<User*>::iterator it = userList.begin(); it != userList.end(); ++it)
+    {
+        if ((*it)->GetUserFd() == user_fd)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void Server::GetUserInfo(int user_fd, std::string& buffer)
+{
+    std::istringstream iss(buffer);
+    std::string line;
+    
+    std::string nickname;
+    std::string password;
+    std::string username;
+
+    while (std::getline(iss, line)) {
+        if (line.find("PASS ") == 0) 
+        {
+            password = line.substr(5);
+        } 
+        else if (line.find("NICK ") == 0)
+        {
+            nickname = line.substr(5);
+        } 
+        else if (line.find("USER ") == 0)
+        {
+            size_t startPos = line.find("USER ") + 5;
+            size_t endPos = line.find(" ", startPos);
+            username = line.substr(startPos, endPos - startPos);
+            startPos = endPos + 1;
+            endPos = line.find(" ", startPos);
+            std::string hostname = line.substr(startPos, endPos - startPos);
+        }
+        User* newUser = new User(nickname, password, username, user_fd);
+        this->userList.push_back(newUser);
+    }
 }
