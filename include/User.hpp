@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/12 16:40:25 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/19 17:28:00 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/20 17:39:56 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,12 @@ class User
 	
 	public :
 
-	User(std::string first_connection, int user_fd);
+	User(std::string& Nickname, std::string& password, std::string&hostname, int user_fd);
 	~User(void);
 	std::string GetUserName(void) const;
 	void ChangeNickname(std::string new_nickname);
 	std::string GetPassword(void);
+	int GetUserFd();
 
 };
 
