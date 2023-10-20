@@ -13,7 +13,7 @@
 # ifndef USER_HPP
 # define USER_HPP
 
-#include "server.hpp"
+#include "irc.hpp"
 
 class User
 {
@@ -28,8 +28,9 @@ class User
 
 	User(std::string name, int user_fd);
 	~User(void);
-	std::string GetUserName(void);
+	std::string GetUserName(void) const;
 	void ChangeNickname(std::string new_nickname);
+    int getFd(void) const;
 
 };
 
