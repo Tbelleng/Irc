@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/20 17:31:03 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/20 18:42:00 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,9 @@
 # include <arpa/inet.h>
 # include <netinet/in.h> 
 # include <vector>
-# include "Topic.hpp"
 # include "Channel.hpp"
+# include "Topic.hpp"
 # include "User.hpp"
-# include "irc.hpp"
 
 
 class Server

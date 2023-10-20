@@ -6,14 +6,12 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/12 16:40:25 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/20 17:39:56 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/20 18:37:45 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # ifndef USER_HPP
 # define USER_HPP
-
-# include "server.hpp"
 
 class User
 {
