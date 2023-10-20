@@ -41,4 +41,7 @@ class Server
 
 };
 
+bool    _parcing(std::string buffer, int socket_client);
+//User&   getUser(int socket_client);
+
 #endif
