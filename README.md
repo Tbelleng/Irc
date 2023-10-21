@@ -37,7 +37,7 @@ You should run this command in irssi:
 ### General Setup and Planning
 - [X] Create a project repository on GitHub.
 - [X] Define project requirements and objectives.
-- [ ] Set up a development environment.
+- [X] Set up a development environment.
 - [ ] Create an initial project structure.
 
 ### Server Implementation
