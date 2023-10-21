@@ -1,6 +1,5 @@
-#pragma once
-
-# include "irc.hpp"
+#ifndef TOPIC_HPP
+#define TOPIC_HPP
 
 class   Topic {
 private:
@@ -19,3 +18,5 @@ public:
     void        setTopic(std::string newTopic);
     void        setGrade(int grade);
 };
+
+# endif

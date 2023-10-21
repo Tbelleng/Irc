@@ -1,6 +1,5 @@
-#pragma once
-
-#include "irc.hpp"
+#ifndef CHANNEL_HPP
+#define CHANNEL_HPP
 
 class   Channel {
 private:
@@ -31,3 +30,5 @@ public:
 
     void                 sendMessage(const char* message) const;
 };
+
+#endif

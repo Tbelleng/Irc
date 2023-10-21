@@ -6,12 +6,13 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/12 16:40:25 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/20 18:37:45 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/21 17:49:10 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # ifndef USER_HPP
 # define USER_HPP
+
 
 class User
 {

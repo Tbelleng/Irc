@@ -1,5 +1,6 @@
 #include "irc.hpp"
 
+
 std::vector<std::string>    ft_split(std::string s1, const char token) {
     std::vector<std::string>    buffer;
     std::string                 tmp;

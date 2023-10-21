@@ -1,6 +1,5 @@
-#pragma once
-
-# include "irc.hpp"
+# ifndef MESSAGE_HPP
+# define MESSAGE_HPP
 
 class   Message {
 private:
@@ -18,3 +17,5 @@ public:
     Channel     getChannel(void) const;
     User        getSender(void) const;
 };
+
+# endif

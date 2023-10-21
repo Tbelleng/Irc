@@ -6,12 +6,12 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 16:19:46 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 18:31:31 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/21 17:04:55 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
-#include "irc.hpp"
+#include "server.hpp"
 
 int main(int argc, char **argv) 
 {

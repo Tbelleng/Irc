@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/20 18:42:00 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/21 19:40:10 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,12 @@
 # include <arpa/inet.h>
 # include <netinet/in.h> 
 # include <vector>
-# include "Channel.hpp"
 # include "Topic.hpp"
+# include "Channel.hpp"
 # include "User.hpp"
-
+# include "Pars.hpp"
+# include "irc.hpp"
+# include "Message.hpp"
 
 class Server
 {
@@ -65,11 +67,12 @@ class Server
 	int AddingNewClient(int epoll_fd, struct epoll_event* events);
 	int ClientCheck(int user_fd);
 	void GetUserInfo(int user_fd, std::string& buffer);
+	User& whichUser(int user_fd);
 
 };
 
 
-bool    _parcing(std::string buffer, int socket_client);
+bool    _parcing(std::string buffer, User* sender);
 //User&   getUser(int socket_client);
 void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 

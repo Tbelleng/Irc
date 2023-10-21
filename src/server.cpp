@@ -6,11 +6,12 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/20 18:48:46 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/21 19:08:33 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "server.hpp"
+# include "utils_server.cpp"
 
 int MAX_UTILISATEURS = 10;
 
@@ -118,24 +119,19 @@ void Server::ServerRun(void)
                 //check if this fd exist within users
                 char buffer[512];
                 int bytes_read = recv(events[i].data.fd, buffer, sizeof(buffer), 0);
+                buffer[bytes_read] = '\0';
                 std::string message(buffer, bytes_read);
-                
                 if (this->ClientCheck(events[i].data.fd) == 0)
                 {
                     this->GetUserInfo(events[i].data.fd, message);
+                    std::cout << "New user Added ! His fd is : " << events[i].data.fd << std::endl;
                 }
                 if (bytes_read > 0) 
                 {
-                    std::string message(buffer, bytes_read);
-
+                    User& current_user = this->whichUser(events[i].data.fd);
                         // Handle messages from clients
-                    if (message.find("JOIN") == 0) 
-                    {
-                        std::string channel_title  = message.substr(5);
-                        send(events[i].data.fd, channel_title.c_str(), channel_title.size(), 0);
-                        std::cout << "CHANNEL CREATED" << std::endl;
-                        return ;
-                    }
+                        // Do 2 parts : If its a command or a regular message
+                    _parcing(message, current_user);
                 } 
                 else 
                     write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands
@@ -194,7 +190,6 @@ int    Server::AddingNewClient(int epoll_fd, struct epoll_event* )
         return -1;
     }
     clientSockets.push_back(clientSocket);
-    std::cout << "New Client Added ! listenning..." << std::endl;
     
     return 0;
 }
@@ -248,4 +243,16 @@ void Server::GetUserInfo(int user_fd, std::string& buffer)
     }
     User* newUser = new User(nickname, password, username, user_fd);
     this->userList.push_back(newUser);
+}
+
+User& Server::whichUser(int user_fd)
+{
+    for (std::vector<User*>::iterator it = userList.begin(); it != userList.end(); ++it)
+    {
+        if ((*it)->GetUserFd() == user_fd)
+        {
+            return *(*it);
+        }
+    }
+    throw std::runtime_error("User not found");
 }
