@@ -38,7 +38,7 @@ You should run this command in irssi:
 - [X] Create a project repository on GitHub.
 - [X] Define project requirements and objectives.
 - [X] Set up a development environment.
-- [ ] Create an initial project structure.
+- [X] Create an initial project structure.
 
 ### Server Implementation
 - [ ] Design and implement the IRC server architecture.
