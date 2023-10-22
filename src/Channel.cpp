@@ -95,6 +95,18 @@ void    Channel::suppOpMember(int opMember, int suppOpMember) {
     return ;
 }
 
+void    Channel::memberLeave(int leaver) {
+    if (*find(this->_members.begin(), this->_members.end(), leaver) == leaver) {
+        this->_members.erase(
+            std::remove(this->_members.begin(), this->_members.end(), leaver),
+            this->_members.end()
+        );
+    } else {
+        _send("Not an channel member!", leaver, this->_epfd, this->_ev);
+    }
+    return ;
+}
+
 std::vector<int> Channel::getAllMember( void ) const {
     return this->_members;
 }

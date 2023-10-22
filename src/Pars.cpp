@@ -5,26 +5,14 @@ Command parseCommand(const std::string& cmd) {
         return MODE;
     } else if (cmd == "KICK") {
         return KICK;
-    } else if (cmd == "INVITE") {
-        return INVITE;
     } else if (cmd == "PART") {
         return PART;
     } else if (cmd == "JOIN") {
         return JOIN;
-    } else if (cmd == "WHO") {
-        return WHO;
-    } else if (cmd == "WHOIS") {
-        return WHOIS;
-    } else if (cmd == "WHOWAS") {
-        return WHOWAS;
-    } else if (cmd == "KILL") {
-        return KILL;
     } else if (cmd == "NOTICE") {
         return NOTICE;
     } else if (cmd == "PASS") {
         return PASS;
-    } else if (cmd == "OPER") {
-        return OPER;
     } else if (cmd == "TOPIC") {
         return TOPIC;
     } else if (cmd == "USER") {
@@ -33,10 +21,6 @@ Command parseCommand(const std::string& cmd) {
         return QUIT;
     } else if (cmd == "NICK") {
         return NICK;
-    } else if (cmd == "NAMES") {
-        return NAMES;
-    } else if (cmd == "LIST") {
-        return LIST;
     }
     return UNKNOWN;
 }
@@ -86,7 +70,7 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
     std::string argument = "332 " + channelName + " :This is the channel topic";
     // argument += "332\r\n"; 
     sendMessage(sender.GetUserFd(), argument);
-    
+
     std::cout << "You used JOIN " << sender.GetUserFd() << std::endl;
 }
 //********************************************************************
@@ -97,16 +81,16 @@ void    kick(std::vector<std::string> buffers, User& sender) {
     std::cout << "You used KICK" << std::endl;
 }
 
-void    invite(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used INVITE" << std::endl;
-}
 
-void    part(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
+void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
     std::cout << "You used PART" << std::endl;
+    if (buffers.size() == 2)
+        return ;
+    for(std::vector<Channel *>::iterator it = channelList.begin(); it == channelList.end(); it++) {
+        std::vector<int>    channelMembers = (*it)->getAllMember();
+        if (*find(channelMembers.begin(), channelMembers.end(), sender.GetUserFd()) == sender.GetUserFd())
+            (*it)->memberLeave(sender.GetUserFd());
+    }
 }
 
 void    mode(std::vector<std::string> buffers, User& sender) {
@@ -115,46 +99,10 @@ void    mode(std::vector<std::string> buffers, User& sender) {
     //std::cout << "You are in JOIN" << std::endl;
 }
 
-void    who(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    //std::cout << "You are in JOIN" << std::endl;
-}
-
-void    whois(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    //std::cout << "You are in WHOIS" << std::endl;
-}
-
-void    whowas(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    //std::cout << "You are in WHOWAS" << std::endl;
-}
-
-void    kill(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used KILL" << std::endl;
-}
-
 void    notice(std::vector<std::string> buffers, User& sender) {
     (void)buffers;
     (void)sender;
     //std::cout << "You are in NOTICE" << std::endl;
-}
-
-void    pass(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    //std::cout << "You are in PASS" << std::endl;
-}
-
-void    oper(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    //std::cout << "You are in OPER" << std::endl;
 }
 
 void    topic(std::vector<std::string> buffers, User& sender) {
@@ -179,18 +127,6 @@ void    nick(std::vector<std::string> buffers, User& sender) {
     (void)buffers;
     (void)sender;
     std::cout << "You used NICK" << std::endl;
-}
-
-void    names(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used NAMES" << std::endl;
-}
-
-void    list(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used LIST" << std::endl;
 }
 
 void    sendNoCmd(std::vector<std::string> buffers, User& sender) {

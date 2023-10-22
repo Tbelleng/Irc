@@ -20,6 +20,7 @@ Server::Server(int port, std::string password)
 {
     this->port = port;
     this->password = password;
+    setError(this->_error);
 	std::cout << "Server initialized" << std::endl;
 }
 
