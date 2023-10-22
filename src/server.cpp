@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/22 02:53:21 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/22 07:23:22 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,8 @@ void Server::ServerRun(void)
                 {
                     this->GetUserInfo(events[i].data.fd, message);
                     std::cout << "New user Added ! His fd is : " << events[i].data.fd << std::endl;
+                    std::string responsed = "372 : Welcome to our IRC server !\r\n";
+                    send(events[i].data.fd, responsed.c_str(), responsed.size(), 0);
                 }
                 if (bytes_read > 0) 
                 {
