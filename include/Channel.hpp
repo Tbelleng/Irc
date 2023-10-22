@@ -27,6 +27,7 @@ public:
 
     void                suppMember(int opMember, int suppMember);
     void                suppOpMember(int opMember, int suppOpMember);
+    void                memberLeave(int leaver);
 
     void                 sendMessage(const char* message) const;
 };

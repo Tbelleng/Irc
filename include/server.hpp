@@ -42,6 +42,11 @@
 # include "irc.hpp"
 # include "Message.hpp"
 
+struct  s_error {
+    int nbError;
+    std::string rplError;
+};
+
 class Server
 {
 	private :
@@ -55,6 +60,7 @@ class Server
 	std::vector<int> clientSockets;
 	std::vector<User*> userList;
 	std::vector<Channel*> channelList;
+    std::vector<struct s_error> _error;
 	
 	public :
 	

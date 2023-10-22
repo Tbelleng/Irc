@@ -20,6 +20,7 @@ Server::Server(int port, std::string password)
 {
     this->port = port;
     this->password = password;
+    setError(this->_error);
 	std::cout << "Server initialized" << std::endl;
 }
 
@@ -266,4 +267,3 @@ User& Server::whichUser(int user_fd)
     }
     throw std::runtime_error("User not found");
 }
-
