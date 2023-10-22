@@ -21,6 +21,7 @@
 # include <vector>
 # include <map>
 # include <iostream>
+# include <string>
 # include <fcntl.h>
 # include <cstring>
 # include <sstream>
@@ -41,6 +42,8 @@
 # include "Pars.hpp"
 # include "irc.hpp"
 # include "Message.hpp"
+
+void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 
 struct  s_error {
     int nbError;
@@ -75,12 +78,12 @@ class Server
 	int ClientCheck(int user_fd);
 	void GetUserInfo(int user_fd, std::string& buffer);
 	User& whichUser(int user_fd);
+    void    sendError(std::string str, int error, int socket_client);
 
 };
 
 
 bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList);
 //User&   getUser(int socket_client);
-void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 
 #endif

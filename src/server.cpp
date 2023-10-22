@@ -267,3 +267,32 @@ User& Server::whichUser(int user_fd)
     }
     throw std::runtime_error("User not found");
 }
+
+std::string find_error(int error, std::vector<struct s_error> _error) {
+    for (std::vector<struct s_error>::iterator it = _error.begin(); it != _error.end(); it++) {
+        if (it->nbError == error)
+            return it->rplError;
+    }
+    return 0;
+}
+
+void    Server::sendError(std::string str, int error, int socket_client) {
+    std::stringstream   ss;
+
+    ss << error;
+    std::string error_str = ss.str();
+    if (find_error(error, this->_error) == "")
+        return ;
+    if (error == 412 || error == 431 || error == 462) {
+        std::string str_error = error_str + " " + find_error(error, this->_error);
+        _send(str_error.c_str(), socket_client, this->epoll_fd, this->event);
+        return ;
+    } else if (error == 411) {
+        std::string str_error = error_str + " " + find_error(error, this->_error) + "(" + str + ")\r\n";
+        _send(str_error.c_str(), socket_client, this->epoll_fd, this->event);
+        return ;
+    }
+        std::string str_error = error_str + " " + str  + find_error(error, this->_error);
+        _send(str_error.c_str(), socket_client, this->epoll_fd, this->event);
+    return ;
+}
