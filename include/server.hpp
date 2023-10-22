@@ -50,6 +50,11 @@ struct  s_error {
     std::string rplError;
 };
 
+struct  s_replie {
+    int nbReplie;
+    std::string rplReplie;
+};
+
 class Server
 {
 	private :
@@ -64,6 +69,7 @@ class Server
 	std::vector<User*> userList;
 	std::vector<Channel*> channelList;
     std::vector<struct s_error> _error;
+    std::vector<struct s_replie> _replie;
 	
 	public :
 	
@@ -79,6 +85,7 @@ class Server
 	void GetUserInfo(int user_fd, std::string& buffer);
 	User& whichUser(int user_fd);
     void    sendError(std::string str, int error, int socket_client);
+    void    sendReplie(std::vector<std::string> buffer, int replie, int socket_client);
 
 };
 

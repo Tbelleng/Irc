@@ -8,6 +8,28 @@
 //     return 0;
 // }
 
+void    setReplie(std::vector<struct s_replie>& replie) {
+    struct s_replie a;
+    a.nbReplie = 221;
+    a.rplReplie = "\r\n";
+    replie.push_back(a);
+    a.nbReplie = 301;
+    a.rplReplie = " :";
+    replie.push_back(a);
+    a.nbReplie = 324;
+    a.rplReplie = "\r\n";
+    replie.push_back(a);
+    a.nbReplie = 331;
+    a.rplReplie = " :No topic is set\r\n";
+    replie.push_back(a);
+    a.nbReplie = 332;
+    a.rplReplie = " :";
+    replie.push_back(a);
+    a.nbReplie = 368;
+    a.rplReplie = " :End of channel ban list\r\n";
+    replie.push_back(a);
+}
+
 void    setError(std::vector<struct s_error>& error) {
     struct s_error a;
     a.nbError = 401;
@@ -20,7 +42,7 @@ void    setError(std::vector<struct s_error>& error) {
     a.rplError = ":Cannot send to channel\r\n";
     error.push_back(a);
     a.nbError = 411;
-    a.rplError = ":No recipient given\r\n";
+    a.rplError = ":No recipient given";
     error.push_back(a);
     a.nbError = 412;
     a.rplError = ":No text to send\r\n";

@@ -21,6 +21,7 @@ Server::Server(int port, std::string password)
     this->port = port;
     this->password = password;
     setError(this->_error);
+    setReplie(this->_replie);
 	std::cout << "Server initialized" << std::endl;
 }
 
@@ -294,5 +295,36 @@ void    Server::sendError(std::string str, int error, int socket_client) {
     }
         std::string str_error = error_str + " " + str  + find_error(error, this->_error);
         _send(str_error.c_str(), socket_client, this->epoll_fd, this->event);
+    return ;
+}
+
+std::string find_replie(int replie, std::vector<struct s_replie> _replie) {
+    for (std::vector<struct s_replie>::iterator it = _replie.begin(); it != _replie.end(); it++) {
+        if (it->nbReplie == replie)
+            return it->rplReplie;
+    }
+    return 0;
+}
+
+void    Server::sendReplie(std::vector<std::string> buffer, int replie, int socket_client) {
+    std::stringstream   ss;
+
+    ss << replie;
+    std::string replie_str = ss.str();
+    if (find_replie(replie, this->_replie) == "")
+        return ;
+    if (replie == 331 || replie == 368) {
+        std::string str_replie = replie_str + " " + buffer[0] + find_replie(replie, this->_replie);
+        _send(str_replie.c_str(), socket_client, this->epoll_fd, this->event);
+    } else if (replie == 221 || replie == 324){
+        std::string str_replie = replie_str + " ";
+        for(std::vector<std::string>::iterator it = buffer.begin(); it != buffer.end(); it++)
+            str_replie += *it;
+        str_replie += find_replie(replie, this->_replie);
+        _send(str_replie.c_str(), socket_client, this->epoll_fd, this->event);
+    } else if (replie == 301 || replie == 332) {
+        std::string str_replie = replie_str + " " + buffer[0] + find_replie(replie, this->_replie) + buffer[1] + "\r\n";
+        _send(str_replie.c_str(), socket_client, this->epoll_fd, this->event);
+    }
     return ;
 }
