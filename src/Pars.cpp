@@ -41,12 +41,55 @@ Command parseCommand(const std::string& cmd) {
     return UNKNOWN;
 }
 
-
-void    join(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used JOIN" << std::endl;
+//***********************************JOIN FUNCTION*********************
+bool setNonBlocking(int socket_fd)
+{
+    if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) == -1) {
+        perror("fcntl");
+        return false;
+    }
+    return true;
 }
+
+bool sendMessage(int user_fd, const std::string& message)
+{
+    if (!setNonBlocking(user_fd)) {
+        return false;
+    }
+
+    ssize_t bytes_sent = write(user_fd, message.c_str(), message.size());
+
+    if (bytes_sent == -1) {
+        if (errno == EAGAIN) {
+            std::cout << "Message send would block." << std::endl;
+            return false;
+        } else {
+            perror("write");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList)
+{
+    (void)channelList;
+    std::string channelName = "Gallieni";
+    if (buffers.size() == 1 || buffers.size() > 2)
+    {
+        std::string argument = "332 " + channelName + " :This is the channel topic";
+        // argument += "332\r\n"; 
+        sendMessage(sender.GetUserFd(), argument);
+        return ;
+    }
+    std::string argument = "332 " + channelName + " :This is the channel topic";
+    // argument += "332\r\n"; 
+    sendMessage(sender.GetUserFd(), argument);
+    
+    std::cout << "You used JOIN " << sender.GetUserFd() << std::endl;
+}
+//********************************************************************
 
 void    kick(std::vector<std::string> buffers, User& sender) {
     (void)buffers;

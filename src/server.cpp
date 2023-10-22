@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/21 19:08:33 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/22 02:53:21 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void Server::ServerRun(void)
                     User& current_user = this->whichUser(events[i].data.fd);
                         // Handle messages from clients
                         // Do 2 parts : If its a command or a regular message
-                    _parcing(message, current_user);
+                    _parcing(message, current_user, this->channelList);
                 } 
                 else 
                     write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands
@@ -169,7 +169,7 @@ int    Server::SetSocket(unsigned int port)
 
 int    Server::AddingNewClient(int epoll_fd, struct epoll_event* )
 {
-    struct sockaddr_in clientAddress;
+    struct sockaddr_in clientAddress = sockaddr_in();
     socklen_t clientAddrLen = sizeof(clientAddress);
     int clientSocket = accept(this->serverSocket, (struct sockaddr*)&clientAddress, &clientAddrLen);
 
@@ -181,16 +181,24 @@ int    Server::AddingNewClient(int epoll_fd, struct epoll_event* )
             return -1;
         }
     }
+    else 
+    {
+        if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1) 
+        {
+            perror("fcntl");
+            return (0);
+        }
+    }
     
-    event.events = EPOLLIN;
+    clientSockets.push_back(clientSocket);
+    event.events = EPOLLIN | EPOLLRDHUP;
     event.data.fd = clientSocket;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientSocket, &event) == -1)
     {
         perror("epoll_ctl");
         return -1;
     }
-    clientSockets.push_back(clientSocket);
-    
+
     return 0;
 }
 

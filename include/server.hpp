@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/21 19:40:10 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/22 03:56:17 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # define DEBUG_CHANNEL 0
 # define DEBUG_TOPIC 0
+# define RPL_TOPIC 332
 
 # include <algorithm>
 # include <vector>
@@ -53,7 +54,7 @@ class Server
 	struct epoll_event event;
 	std::vector<int> clientSockets;
 	std::vector<User*> userList;
-	//std::vector<Channel*> channelList;
+	std::vector<Channel*> channelList;
 	
 	public :
 	
@@ -72,7 +73,7 @@ class Server
 };
 
 
-bool    _parcing(std::string buffer, User* sender);
+bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList);
 //User&   getUser(int socket_client);
 void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 

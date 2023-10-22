@@ -8,8 +8,9 @@
 //     return 0;
 // }
 
-bool    _parcing(std::string buffer, User& sender) 
+bool    _parcing(std::string buffer, User& sender, std::vector<Channel*> channelList) 
 {
+    
     std::vector<std::string>    buffers = ft_split(buffer, ' '); 
     Command cmd = parseCommand(buffers[0]);
     
@@ -27,7 +28,7 @@ bool    _parcing(std::string buffer, User& sender)
             part(buffers, sender);
             break;
         case JOIN:
-            join(buffers, sender);
+            join(buffers, sender, channelList);
             break;
         case WHO:
             who(buffers, sender);
