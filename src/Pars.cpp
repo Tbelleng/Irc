@@ -74,20 +74,24 @@ bool sendMessage(int user_fd, const std::string& message)
 
 void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList)
 {
+    // utiliser Channel ici 1/ Veirifier si channel eiste, si non creer une puis partir dans une fonction channel
+    // 
     (void)channelList;
-    std::string channelName = "Gallieni";
+    std::string channelName = buffers[1];
+    
     if (buffers.size() == 1 || buffers.size() > 2)
     {
-        std::string argument = "332 " + channelName + " :This is the channel topic";
+        std::string argument = "PRIVMSG " + channelName + " :This is the channel topic \r\n";
         // argument += "332\r\n"; 
         sendMessage(sender.GetUserFd(), argument);
         return ;
     }
-    std::string argument = "332 " + channelName + " :This is the channel topic";
-    // argument += "332\r\n"; 
+    
+    // std::string argument = "PRIVMSG " + channelName + " :Welcome to the channel\r\n";
+    std::string argument = "PRIVMSG " + channelName + " :Welcome to the channel \r\n";
     sendMessage(sender.GetUserFd(), argument);
     
-    std::cout << "You used JOIN " << sender.GetUserFd() << std::endl;
+    std::cout << "You used JOIN " << channelName << std::endl;
 }
 //********************************************************************
 
@@ -166,7 +170,10 @@ void    topic(std::vector<std::string> buffers, User& sender) {
 void    user(std::vector<std::string> buffers, User& sender) {
     (void)buffers;
     (void)sender;
-    std::cout << "You used USER" << std::endl;
+    //std::string argument = "PRIVMSG : Welcome to our IRC Server !";
+    //"332 " + channelName + " :This is the channel topic";
+    // argument += "332\r\n"; 
+    //sendMessage(sender.GetUserFd(), argument);
 }
 
 void    quit(std::vector<std::string> buffers, User& sender) {
