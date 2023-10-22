@@ -6,12 +6,12 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 16:19:46 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/17 18:31:31 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/22 01:12:34 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
-#include "irc.hpp"
+#include "server.hpp"
 
 int main(int argc, char **argv) 
 {
@@ -24,6 +24,7 @@ int main(int argc, char **argv)
     if (port <= 0 || port > 60000)
     {
         std::cout << "Invalid Port" << std::endl;
+        return 1;
     }
     std::string password = std::string(argv[2]);
     Server *irc = new Server(port, password);

@@ -1,86 +1,200 @@
 #include "Pars.hpp"
 
-Pars::Pars() {
-    return ;
+Command parseCommand(const std::string& cmd) {
+    if (cmd == "MODE") {
+        return MODE;
+    } else if (cmd == "KICK") {
+        return KICK;
+    } else if (cmd == "INVITE") {
+        return INVITE;
+    } else if (cmd == "PART") {
+        return PART;
+    } else if (cmd == "JOIN") {
+        return JOIN;
+    } else if (cmd == "WHO") {
+        return WHO;
+    } else if (cmd == "WHOIS") {
+        return WHOIS;
+    } else if (cmd == "WHOWAS") {
+        return WHOWAS;
+    } else if (cmd == "KILL") {
+        return KILL;
+    } else if (cmd == "NOTICE") {
+        return NOTICE;
+    } else if (cmd == "PASS") {
+        return PASS;
+    } else if (cmd == "OPER") {
+        return OPER;
+    } else if (cmd == "TOPIC") {
+        return TOPIC;
+    } else if (cmd == "USER") {
+        return USER;
+    } else if (cmd == "QUIT") {
+        return QUIT;
+    } else if (cmd == "NICK") {
+        return NICK;
+    } else if (cmd == "NAMES") {
+        return NAMES;
+    } else if (cmd == "LIST") {
+        return LIST;
+    }
+    return UNKNOWN;
 }
 
-Pars::~Pars() {
-    return ;
+//***********************************JOIN FUNCTION*********************
+bool setNonBlocking(int socket_fd)
+{
+    if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) == -1) {
+        perror("fcntl");
+        return false;
+    }
+    return true;
 }
 
-void    Pars::join(std::vector<std::string> buffers, User& sender) {
-    //todo
+bool sendMessage(int user_fd, const std::string& message)
+{
+    if (!setNonBlocking(user_fd)) {
+        return false;
+    }
+
+    ssize_t bytes_sent = write(user_fd, message.c_str(), message.size());
+
+    if (bytes_sent == -1) {
+        if (errno == EAGAIN) {
+            std::cout << "Message send would block." << std::endl;
+            return false;
+        } else {
+            perror("write");
+            return false;
+        }
+    }
+
+    return true;
 }
 
-void    Pars::kick(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList)
+{
+    (void)channelList;
+    std::string channelName = "Gallieni";
+    if (buffers.size() == 1 || buffers.size() > 2)
+    {
+        std::string argument = "332 " + channelName + " :This is the channel topic";
+        // argument += "332\r\n"; 
+        sendMessage(sender.GetUserFd(), argument);
+        return ;
+    }
+    std::string argument = "332 " + channelName + " :This is the channel topic";
+    // argument += "332\r\n"; 
+    sendMessage(sender.GetUserFd(), argument);
+    
+    std::cout << "You used JOIN " << sender.GetUserFd() << std::endl;
+}
+//********************************************************************
+
+void    kick(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used KICK" << std::endl;
 }
 
-void    Pars::invite(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    invite(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used INVITE" << std::endl;
 }
 
-void    Pars::part(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    part(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used PART" << std::endl;
 }
 
-void    Pars::mode(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    mode(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    //std::cout << "You are in JOIN" << std::endl;
 }
 
-void    Pars::who(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    who(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    //std::cout << "You are in JOIN" << std::endl;
 }
 
-void    Pars::whois(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    whois(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    //std::cout << "You are in WHOIS" << std::endl;
 }
 
-void    Pars::whowas(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    whowas(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    //std::cout << "You are in WHOWAS" << std::endl;
 }
 
-void    Pars::kill(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    kill(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used KILL" << std::endl;
 }
 
-void    Pars::notice(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    notice(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    //std::cout << "You are in NOTICE" << std::endl;
 }
 
-void    Pars::pass(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    pass(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    //std::cout << "You are in PASS" << std::endl;
 }
 
-void    Pars::oper(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    oper(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    //std::cout << "You are in OPER" << std::endl;
 }
 
-void    Pars::topic(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    topic(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used TOPIC" << std::endl;
 }
 
-void    Pars::user(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    user(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used USER" << std::endl;
 }
 
-void    Pars::quit(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    quit(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used QUIT" << std::endl;
 }
 
-void    Pars::nick(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    nick(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used NICK" << std::endl;
 }
 
-void    Pars::names(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    names(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used NAMES" << std::endl;
 }
 
-void    Pars::list(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    list(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    std::cout << "You used LIST" << std::endl;
 }
 
-void    Pars::sendNoCmd(std::vector<std::string> buffers, User& sender) {
-    //todo
+void    sendNoCmd(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
 }
 
