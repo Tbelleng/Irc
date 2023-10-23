@@ -259,8 +259,7 @@ void    nick(std::vector<std::string> buffers, User& sender, std::vector<User*> 
 }
 
 void    pass(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
+
     // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_ALREADYREGISTRED(462)
 }
 
