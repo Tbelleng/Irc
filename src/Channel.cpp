@@ -118,3 +118,15 @@ void     Channel::sendMessage(const char* message) const {
     }
     return ;
 }
+
+bool Channel::isInChannel(int user)
+{
+    // std::string compare = sender.GetUserName();
+    for (std::vector<int>::iterator it = this->_members.begin(); it != this->_members.end(); ++it) 
+    {
+         if (*it == user) {
+            return true;
+        }
+    }
+    return false;
+}

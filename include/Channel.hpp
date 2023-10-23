@@ -1,6 +1,8 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
+# include "server.hpp"
+
 class   Channel {
 private:
     std::vector<int>    _members;
@@ -30,6 +32,8 @@ public:
     void                memberLeave(int leaver);
 
     void                 sendMessage(const char* message) const;
+
+    bool                isInChannel(int user);
 };
 
 #endif

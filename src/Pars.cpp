@@ -85,6 +85,14 @@ void    kick(std::vector<std::string> buffers, User& sender) {
 }
 
 
+Channel*     find_channel_name(std::vector<Channel*> channelList, std::string channel_name) {
+    for(std::vector<Channel*>::iterator it = channelList.begin(); it != channelList.end(); it++) {
+        if((*it)->getName() == channel_name)
+            return *it;
+    }
+    return 0;
+}
+
 void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
     std::vector<struct s_replie>    replie;
 
@@ -96,20 +104,20 @@ void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel
         return ;
     }
     for (std::vector<std::string>::iterator it = buffers.begin() + 2; it != buffers.end(); it++) {
-        int i = find_channel_name(channelList, *it);
-        if (i == -1) {
+        Channel* chan = find_channel_name(channelList, *it);
+        if (chan == 0) {
             std::vector<std::string>    tmp;
             tmp.push_back(*it);
             Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
         }
-        Channel *chan = channelList[i];
-        if(!chan->getChannelMembers(sender)){
+        if(!chan->isInChannel(sender.GetUserFd())){
             std::vector<std::string>    tmp;
             tmp.push_back(*it);
             Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
         }
+        chan->memberLeave(sender.GetUserFd());
     }
-    //return error : ERR_NOTONCHANNEL(442)<channel> ERR_NOSUCHCHANNEL(403)<channel name>
+    return ;
 }
 
 void    mode(std::vector<std::string> buffers, User& sender) {
