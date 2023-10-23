@@ -100,7 +100,7 @@ bool    _parcing(std::string buffer, User& sender, std::vector<Channel*> channel
             join(buffers, sender, channelList);
             break;
         case TOPIC:
-            topic(buffers, sender);
+            topic(buffers, sender, channelList);
             break;
         case USER:
             user(buffers, sender);

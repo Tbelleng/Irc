@@ -128,12 +128,40 @@ void    mode(std::vector<std::string> buffers, User& sender) {
     //std::cout << "You are in JOIN" << std::endl;
 }
 
-void    topic(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used TOPIC" << std::endl;
-    //return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_NOTONCHANNEL(442)<channel> ERR_CHANOPRIVSNEEDED(482)<channel>
-    // replie : RPL_NOTOPIC(331)<channel> RPL_TOPIC(332)<channel><topic>
+void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
+    std::vector<struct s_replie>    replie;
+
+    setReplie(&replie);
+    if (buffers.size() < 2) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[1]);
+        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
+        return ;
+    }
+    Channel* chan = find_channel_name(channelList, buffers[2]);
+    if (chan == 0) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+    }
+    if(!chan->isInChannel(sender.GetUserFd())){
+        std::vector<std::string>    tmp;
+        tmp.push_back(chan->getName());
+        Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
+    }
+    std::string topic = chan->getTopic();
+    if (topic == "")
+    {
+        std::vector<std::string>    tmp;
+        tmp.push_back(chan->getName());
+        Server::sendReplie(tmp , 331, sender.GetUserFd(), replie);
+    } else {
+        std::vector<std::string>    tmp;
+        tmp.push_back(chan->getName());
+        tmp.push_back(topic);
+        Server::sendReplie(tmp , 332, sender.GetUserFd(), replie);
+    }
+    //return error : ERR_CHANOPRIVSNEEDED(482)<channel>
 }
 
 void    user(std::vector<std::string> buffers, User& sender) {

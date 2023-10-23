@@ -22,7 +22,7 @@ std::string Channel::getName( void ) const {
 }
 
 std::string Channel::getTopic(void) const {
-    Channel::sendMessage(this->_topic.getTopic().c_str());
+    // Channel::sendMessage(this->_topic.getTopic().c_str());
     return (this->_topic.getTopic());
 }
 
