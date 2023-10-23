@@ -77,13 +77,13 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
 }
 //********************************************************************
 
-void    kick(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used KICK" << std::endl;
-    //return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_NOTONCHANNEL(442)<channel> ERR_NOSUCHCHANNEL(403)<channel name> ERR_CHANNOPRIVSNEEDED(482)<channel>
+User*     find_member_name(std::vector<User*> userList, std::string member_name) {
+    for(std::vector<User*>::iterator it = userList.begin(); it != userList.end(); it++) {
+        if((*it)->GetUserName() == member_name)
+            return *it;
+    }
+    return 0;
 }
-
 
 Channel*     find_channel_name(std::vector<Channel*> channelList, std::string channel_name) {
     for(std::vector<Channel*>::iterator it = channelList.begin(); it != channelList.end(); it++) {
@@ -91,6 +91,41 @@ Channel*     find_channel_name(std::vector<Channel*> channelList, std::string ch
             return *it;
     }
     return 0;
+}
+
+void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList, std::vector<User*> userList) {
+    std::vector<struct s_replie>    replie;
+
+    setReplie(&replie);
+    if (buffers.size() < 3) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[1]);
+        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
+        return ;
+    }
+    Channel* chan = find_channel_name(channelList, buffers[2]);
+    if (chan == 0) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        return ;
+    }
+    std::vector<int>    allOpMember = chan->getAllOpMember();
+    if(*find(allOpMember.begin(), allOpMember.end(), sender.GetUserFd()) != sender.GetUserFd()){
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        return ;
+    }
+    User*    vic = find_member_name(userList, buffers[3]);
+    if(!chan->isInChannel(vic->GetUserFd())) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        return ;
+    }
+    chan->suppMember(sender.GetUserFd(), vic->GetUserFd());
+    return ;
 }
 
 void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
@@ -185,7 +220,6 @@ void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channe
         tmp.push_back(topic);
         Server::sendReplie(tmp , 332, sender.GetUserFd(), replie);
     }
-    //return error : ERR_CHANOPRIVSNEEDED(482)<channel>
 }
 
 void    user(std::vector<std::string> buffers, User& sender) {
@@ -204,13 +238,6 @@ void    quit(std::vector<std::string> buffers, User& sender) {
     std::cout << "You used QUIT" << std::endl;
 }
 
-User*     find_member_name(std::vector<User*> userList, std::string member_name) {
-    for(std::vector<User*>::iterator it = userList.begin(); it != userList.end(); it++) {
-        if((*it)->GetUserName() == member_name)
-            return *it;
-    }
-    return 0;
-}
 
 void    nick(std::vector<std::string> buffers, User& sender, std::vector<User*> members) {
     std::vector<struct s_replie>    replie;

@@ -91,7 +91,7 @@ bool    _parcing(std::string buffer, User& sender, std::vector<Channel*> channel
             mode(buffers, sender);
             break;
         case KICK:
-            kick(buffers, sender);
+            kick(buffers, sender, channelList, userList);
             break;
         case PART:
             part(buffers, sender, channelList);

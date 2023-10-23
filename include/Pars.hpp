@@ -21,7 +21,7 @@ enum Command {
 Command parseCommand(const std::string& cmd);
 
 void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList);
-void    kick(std::vector<std::string> buffers, User& sender);
+void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList, std::vector<User*> userList);
 void    invite(std::vector<std::string> buffers, User& sender);
 void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList);
 void    mode(std::vector<std::string> buffers, User& sender);

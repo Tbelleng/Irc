@@ -8,13 +8,11 @@ private:
     std::vector<int>    _members;
     std::vector<int>    _opMembers;
     std::string         _name;
-    int                 _epfd;
-    struct epoll_event& _ev;
     Topic               _topic;
 
 public:
-    Channel(int opMember, int epfd, struct epoll_event& ev);
-    Channel(std::string name, int opMember, int epfd, struct epoll_event& ev);
+    Channel(int opMember);
+    Channel(std::string name, int opMember);
     ~Channel( void );
     
     void                setMember(int newMember);

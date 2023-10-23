@@ -1,12 +1,12 @@
 #include "server.hpp"
 
-Channel::Channel(int opMember, int epfd, struct epoll_event& ev) : _name("Default"), _epfd(epfd), _ev(ev), _topic() {
+Channel::Channel(int opMember) : _name("Default"), _topic() {
     this->_opMembers.push_back(opMember);
     if (DEBUG_CHANNEL)
         std::cout << "# Default Channel constructor call #" << std::endl;
 }
 
-Channel::Channel(std::string name, int opMember, int epfd, struct epoll_event& ev) : _name(name), _epfd(epfd), _ev(ev), _topic() {
+Channel::Channel(std::string name, int opMember) : _name(name), _topic() {
     this->_opMembers.push_back(opMember);
     if (DEBUG_CHANNEL)
         std::cout << "# String Channel constructor call #" << std::endl;
@@ -19,6 +19,10 @@ Channel::~Channel( void ) {
 
 std::string Channel::getName( void ) const {
     return this->_name;
+}
+
+std::vector<int>    Channel::getAllOpMember(void) const {
+    return this->_opMembers;
 }
 
 std::string Channel::getTopic(void) const {
