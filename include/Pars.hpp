@@ -29,7 +29,7 @@ void    pass(std::vector<std::string> buffers, User& sender);
 void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList);
 void    user(std::vector<std::string> buffers, User& sender);
 void    quit(std::vector<std::string> buffers, User& sender);
-void    nick(std::vector<std::string> buffers, User& sender);
+void    nick(std::vector<std::string> buffers, User& sender, std::vector<User*> members);
 void    notice(std::vector<std::string> buffers, User& sender);
 void    sendNoCmd(std::vector<std::string> buffers, User& sender);
 

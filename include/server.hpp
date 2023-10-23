@@ -83,7 +83,7 @@ class Server
 
 
 void    setReplie(std::vector<struct s_replie>* replie);
-bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList);
+bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList, std::vector<User*> userList);
 //User&   getUser(int socket_client);
 
 #endif

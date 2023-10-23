@@ -204,11 +204,31 @@ void    quit(std::vector<std::string> buffers, User& sender) {
     std::cout << "You used QUIT" << std::endl;
 }
 
-void    nick(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used NICK" << std::endl;
-    // return error : ERR_NONICKNAMEGIVEN(431) ERR_NICKNAMEINUSE(433)<nick> ERR_NICKCOLLISION(436)<nick>
+User*     find_member_name(std::vector<User*> userList, std::string member_name) {
+    for(std::vector<User*>::iterator it = userList.begin(); it != userList.end(); it++) {
+        if((*it)->GetUserName() == member_name)
+            return *it;
+    }
+    return 0;
+}
+
+void    nick(std::vector<std::string> buffers, User& sender, std::vector<User*> members) {
+    std::vector<struct s_replie>    replie;
+
+    setReplie(&replie);
+    if (buffers.size() < 2) {
+        std::vector<std::string>    tmp;
+        Server::sendReplie(tmp , 431, sender.GetUserFd(), replie);
+        return ;
+    }
+    if(find_member_name(members, buffers[2])) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 433, sender.GetUserFd(), replie);
+        return ;
+    }
+    sender.ChangeNickname(buffers[2]);
+    return ;
 }
 
 void    pass(std::vector<std::string> buffers, User& sender) {

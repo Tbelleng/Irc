@@ -133,7 +133,7 @@ void Server::ServerRun(void)
                     User& current_user = this->whichUser(events[i].data.fd);
                         // Handle messages from clients
                         // Do 2 parts : If its a command or a regular message
-                    _parcing(message, current_user, this->channelList);
+                    _parcing(message, current_user, this->channelList, this->userList);
                 } 
                 else 
                     write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands
