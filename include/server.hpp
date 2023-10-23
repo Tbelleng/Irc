@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luciefer <luciefer@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/23 13:56:51 by luciefer         ###   ########.fr       */
+/*   Updated: 2023/10/22 03:56:17 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ class Server
 	std::vector<int> clientSockets;
 	std::vector<User*> userList;
 	std::vector<Channel*> channelList;
-    std::vector<struct s_replie> _replie;
 	
 	public :
 	
@@ -78,12 +77,12 @@ class Server
 	int ClientCheck(int user_fd);
 	void GetUserInfo(int user_fd, std::string& buffer);
 	User& whichUser(int user_fd);
-    void    sendError(std::string str, int error, int socket_client);
-    void    sendReplie(std::vector<std::string> buffer, int replie, int socket_client);
+    static void    sendReplie(std::vector<std::string> buffer, int replie, int socket_client, std::vector<struct s_replie> _replie);
 
 };
 
 
+void    setReplie(std::vector<struct s_replie>* replie);
 bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList);
 //User&   getUser(int socket_client);
 

@@ -9,8 +9,6 @@ Command parseCommand(const std::string& cmd) {
         return PART;
     } else if (cmd == "JOIN") {
         return JOIN;
-    } else if (cmd == "NOTICE") {
-        return NOTICE;
     } else if (cmd == "PASS") {
         return PASS;
     } else if (cmd == "TOPIC") {
@@ -83,36 +81,51 @@ void    kick(std::vector<std::string> buffers, User& sender) {
     (void)buffers;
     (void)sender;
     std::cout << "You used KICK" << std::endl;
+    //return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_NOTONCHANNEL(442)<channel> ERR_NOSUCHCHANNEL(403)<channel name> ERR_CHANNOPRIVSNEEDED(482)<channel>
 }
 
 
 void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
-    std::cout << "You used PART" << std::endl;
-    if (buffers.size() == 2)
+    std::vector<struct s_replie>    replie;
+
+    setReplie(&replie);
+    if (buffers.size() < 2) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[1]);
+        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
-    for(std::vector<Channel *>::iterator it = channelList.begin(); it == channelList.end(); it++) {
-        std::vector<int>    channelMembers = (*it)->getAllMember();
-        if (*find(channelMembers.begin(), channelMembers.end(), sender.GetUserFd()) == sender.GetUserFd())
-            (*it)->memberLeave(sender.GetUserFd());
     }
+    for (std::vector<std::string>::iterator it = buffers.begin() + 2; it != buffers.end(); it++) {
+        int i = find_channel_name(channelList, *it);
+        if (i == -1) {
+            std::vector<std::string>    tmp;
+            tmp.push_back(*it);
+            Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        }
+        Channel *chan = channelList[i];
+        if(!chan->getChannelMembers(sender)){
+            std::vector<std::string>    tmp;
+            tmp.push_back(*it);
+            Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
+        }
+    }
+    //return error : ERR_NOTONCHANNEL(442)<channel> ERR_NOSUCHCHANNEL(403)<channel name>
 }
 
 void    mode(std::vector<std::string> buffers, User& sender) {
     (void)buffers;
     (void)sender;
+    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_CHANOPRIVSNEEDED(482)<channel> ERR_NOSUCHNICK(401)<nickname> ERR_UNKNOWMODE(472)<char> ERR_NOSUCHCHANNEL(403)<channel name> ERR_USERDONTMATCH(502)
+    // replie : RPL_UNMODEIS(221)<user mode string>
     //std::cout << "You are in JOIN" << std::endl;
-}
-
-void    notice(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    //std::cout << "You are in NOTICE" << std::endl;
 }
 
 void    topic(std::vector<std::string> buffers, User& sender) {
     (void)buffers;
     (void)sender;
     std::cout << "You used TOPIC" << std::endl;
+    //return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_NOTONCHANNEL(442)<channel> ERR_CHANOPRIVSNEEDED(482)<channel>
+    // replie : RPL_NOTOPIC(331)<channel> RPL_TOPIC(332)<channel><topic>
 }
 
 void    user(std::vector<std::string> buffers, User& sender) {
@@ -122,6 +135,7 @@ void    user(std::vector<std::string> buffers, User& sender) {
     //"332 " + channelName + " :This is the channel topic";
     // argument += "332\r\n"; 
     //sendMessage(sender.GetUserFd(), argument);
+    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_ALREADYREGISTRED(462)
 }
 
 void    quit(std::vector<std::string> buffers, User& sender) {
@@ -134,6 +148,13 @@ void    nick(std::vector<std::string> buffers, User& sender) {
     (void)buffers;
     (void)sender;
     std::cout << "You used NICK" << std::endl;
+    // return error : ERR_NONICKNAMEGIVEN(431) ERR_NICKNAMEINUSE(433)<nick> ERR_NICKCOLLISION(436)<nick>
+}
+
+void    pass(std::vector<std::string> buffers, User& sender) {
+    (void)buffers;
+    (void)sender;
+    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_ALREADYREGISTRED(462)
 }
 
 void    sendNoCmd(std::vector<std::string> buffers, User& sender) {
