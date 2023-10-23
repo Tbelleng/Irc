@@ -143,19 +143,43 @@ void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channe
         std::vector<std::string>    tmp;
         tmp.push_back(buffers[2]);
         Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        return ;
     }
     if(!chan->isInChannel(sender.GetUserFd())){
         std::vector<std::string>    tmp;
         tmp.push_back(chan->getName());
         Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
+        return ;
     }
     std::string topic = chan->getTopic();
     if (topic == "")
     {
+        if(buffers.size() >= 3) {
+                std::string topic = 0;
+            for(std::vector<std::string>::iterator it = buffers.begin() + 3; it != buffers.end(); it++)
+               topic += *it; 
+            if (!chan->setTopic(sender.GetUserFd(), topic)) {
+                    std::vector<std::string>    tmp;
+                    tmp.push_back(chan->getName());
+                    Server::sendReplie(tmp , 482, sender.GetUserFd(), replie);
+                    return ;
+            }
+        }
         std::vector<std::string>    tmp;
         tmp.push_back(chan->getName());
         Server::sendReplie(tmp , 331, sender.GetUserFd(), replie);
     } else {
+        if(buffers.size() >= 3) {
+                std::string topic = 0;
+            for(std::vector<std::string>::iterator it = buffers.begin() + 3; it != buffers.end(); it++)
+               topic += *it; 
+            if (!chan->setTopic(sender.GetUserFd(), topic)) {
+                    std::vector<std::string>    tmp;
+                    tmp.push_back(chan->getName());
+                    Server::sendReplie(tmp , 482, sender.GetUserFd(), replie);
+                    return ;
+            }
+        }
         std::vector<std::string>    tmp;
         tmp.push_back(chan->getName());
         tmp.push_back(topic);

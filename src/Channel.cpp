@@ -35,18 +35,18 @@ void    Channel::setGrade(int member, int grade) {
     return ;
 }
 
-void    Channel::setTopic(int member, std::string topic) {
+bool    Channel::setTopic(int member, std::string topic) {
     std::cout << this->_topic.getGrade() << std::endl;
     if (this->_topic.getGrade() == 0){
         if (*find(this->_opMembers.begin(), this->_opMembers.end(), member) == member) {
             this->_topic.setTopic(topic);
         } else {
-            _send("Not an op!", member);
+            return false;
         }
     } else {
         this->_topic.setTopic(topic);
     }
-    return ;
+    return true;
 }
 
 void    Channel::setMember(int newMember) {

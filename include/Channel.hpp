@@ -20,7 +20,7 @@ public:
     void                setMember(int newMember);
     void                setOpMember(int oldOpMember, int newOpMember);
     void                setGrade(int Member, int grade);
-    void                setTopic(int Member, std::string topic);
+    bool                setTopic(int Member, std::string topic);
 
     std::string         getTopic(void) const;
     std::string         getName(void) const;
