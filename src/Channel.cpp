@@ -1,12 +1,12 @@
 #include "server.hpp"
 
-Channel::Channel(int opMember, int epfd, struct epoll_event& ev) : _name("Default"), _epfd(epfd), _ev(ev), _topic() {
+Channel::Channel(int opMember) : _name("Default"), _topic() {
     this->_opMembers.push_back(opMember);
     if (DEBUG_CHANNEL)
         std::cout << "# Default Channel constructor call #" << std::endl;
 }
 
-Channel::Channel(std::string name, int opMember, int epfd, struct epoll_event& ev) : _name(name), _epfd(epfd), _ev(ev), _topic() {
+Channel::Channel(std::string name, int opMember) : _name(name), _topic() {
     this->_opMembers.push_back(opMember);
     if (DEBUG_CHANNEL)
         std::cout << "# String Channel constructor call #" << std::endl;
@@ -21,8 +21,12 @@ std::string Channel::getName( void ) const {
     return this->_name;
 }
 
+std::vector<int>    Channel::getAllOpMember(void) const {
+    return this->_opMembers;
+}
+
 std::string Channel::getTopic(void) const {
-    Channel::sendMessage(this->_topic.getTopic().c_str());
+    // Channel::sendMessage(this->_topic.getTopic().c_str());
     return (this->_topic.getTopic());
 }
 
@@ -35,18 +39,18 @@ void    Channel::setGrade(int member, int grade) {
     return ;
 }
 
-void    Channel::setTopic(int member, std::string topic) {
+bool    Channel::setTopic(int member, std::string topic) {
     std::cout << this->_topic.getGrade() << std::endl;
     if (this->_topic.getGrade() == 0){
         if (*find(this->_opMembers.begin(), this->_opMembers.end(), member) == member) {
             this->_topic.setTopic(topic);
         } else {
-            _send("Not an op!", member);
+            return false;
         }
     } else {
         this->_topic.setTopic(topic);
     }
-    return ;
+    return true;
 }
 
 void    Channel::setMember(int newMember) {
@@ -119,6 +123,17 @@ void     Channel::sendMessage(const char* message) const {
     return ;
 }
 
+bool Channel::isInChannel(int user)
+{
+    // std::string compare = sender.GetUserName();
+    for (std::vector<int>::iterator it = this->_members.begin(); it != this->_members.end(); ++it) 
+    {
+         if (*it == user) {
+            return true;
+        }
+    }
+    return false;
+}
 
 // #include "server.hpp"
 

@@ -20,7 +20,6 @@ Server::Server(int port, std::string password)
 {
     this->port = port;
     this->password = password;
-    setReplie(this->_replie);
 	std::cout << "Server initialized" << std::endl;
 }
 
@@ -134,7 +133,7 @@ void Server::ServerRun(void)
                     User& current_user = this->whichUser(events[i].data.fd);
                         // Handle messages from clients
                         // Do 2 parts : If its a command or a regular message
-                    _parcing(message, current_user, this->channelList);
+                    _parcing(message, current_user, this->channelList, this->userList);
                 } 
                 else 
                     write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands
@@ -276,35 +275,35 @@ std::string find_replie(int replie, std::vector<struct s_replie> _replie) {
     return 0;
 }
 
-void    Server::sendReplie(std::vector<std::string> buffer, int replie, int socket_client) {
+void    Server::sendReplie(std::vector<std::string> buffer, int replie, int socket_client, std::vector<struct s_replie> _replie) {
     std::stringstream   ss;
 
     ss << replie;
     std::string replie_str = ss.str();
-    if (find_replie(replie, this->_replie) == "")
+    if (find_replie(replie, _replie) == "")
         return ;
     if (replie == 331 || replie == 368) {
-        std::string str_replie = replie_str + " " + buffer[0] + find_replie(replie, this->_replie);
+        std::string str_replie = replie_str + " " + buffer[0] + find_replie(replie, _replie);
         _send(str_replie.c_str(), socket_client);
     } else if (replie == 221 || replie == 324){
         std::string str_replie = replie_str + " ";
         for(std::vector<std::string>::iterator it = buffer.begin(); it != buffer.end(); it++)
             str_replie += *it;
-        str_replie += find_replie(replie, this->_replie);
+        str_replie += find_replie(replie, _replie);
         _send(str_replie.c_str(), socket_client);
     } else if (replie == 301 || replie == 332) {
-        std::string str_replie = replie_str + " " + buffer[0] + find_replie(replie, this->_replie) + buffer[1] + "\r\n";
+        std::string str_replie = replie_str + " " + buffer[0] + find_replie(replie, _replie) + buffer[1] + "\r\n";
         _send(str_replie.c_str(), socket_client);
     } else if (replie == 412 || replie == 431 || replie == 462) {
-        std::string str_replie = replie_str + " " + find_replie(replie, this->_replie);
+        std::string str_replie = replie_str + " " + find_replie(replie, _replie);
         _send(str_replie.c_str(), socket_client);
         return ;
     } else if (replie == 411) {
-        std::string str_replie = replie_str + " " + find_replie(replie, this->_replie) + "(" + buffer[0] + ")\r\n";
+        std::string str_replie = replie_str + " " + find_replie(replie, _replie) + "(" + buffer[0] + ")\r\n";
         _send(str_replie.c_str(), socket_client);
         return ;
     } else {
-        std::string str_replie = replie_str + " " + buffer[0]  + find_replie(replie, this->_replie);
+        std::string str_replie = replie_str + " " + buffer[0]  + find_replie(replie, _replie);
         _send(str_replie.c_str(), socket_client);
     }
     return ;

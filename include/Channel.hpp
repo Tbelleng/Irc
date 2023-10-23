@@ -1,24 +1,24 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 
+# include "server.hpp"
+
 class   Channel {
 private:
     std::vector<int>    _members;
     std::vector<int>    _opMembers;
     std::string         _name;
-    int                 _epfd;
-    struct epoll_event& _ev;
     Topic               _topic;
 
 public:
-    Channel(int opMember, int epfd, struct epoll_event& ev);
-    Channel(std::string name, int opMember, int epfd, struct epoll_event& ev);
+    Channel(int opMember);
+    Channel(std::string name, int opMember);
     ~Channel( void );
     
     void                setMember(int newMember);
     void                setOpMember(int oldOpMember, int newOpMember);
     void                setGrade(int Member, int grade);
-    void                setTopic(int Member, std::string topic);
+    bool                setTopic(int Member, std::string topic);
 
     std::string         getTopic(void) const;
     std::string         getName(void) const;
@@ -30,6 +30,8 @@ public:
     void                memberLeave(int leaver);
 
     void                 sendMessage(const char* message) const;
+
+    bool                isInChannel(int user);
 };
 
 #endif

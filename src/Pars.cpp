@@ -9,8 +9,6 @@ Command parseCommand(const std::string& cmd) {
         return PART;
     } else if (cmd == "JOIN") {
         return JOIN;
-    } else if (cmd == "NOTICE") {
-        return NOTICE;
     } else if (cmd == "PASS") {
         return PASS;
     } else if (cmd == "TOPIC") {
@@ -79,40 +77,149 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
 }
 //********************************************************************
 
-void    kick(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used KICK" << std::endl;
+User*     find_member_name(std::vector<User*> userList, std::string member_name) {
+    for(std::vector<User*>::iterator it = userList.begin(); it != userList.end(); it++) {
+        if((*it)->GetUserName() == member_name)
+            return *it;
+    }
+    return 0;
 }
 
+Channel*     find_channel_name(std::vector<Channel*> channelList, std::string channel_name) {
+    for(std::vector<Channel*>::iterator it = channelList.begin(); it != channelList.end(); it++) {
+        if((*it)->getName() == channel_name)
+            return *it;
+    }
+    return 0;
+}
+
+void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList, std::vector<User*> userList) {
+    std::vector<struct s_replie>    replie;
+
+    setReplie(&replie);
+    if (buffers.size() < 3) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[1]);
+        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
+        return ;
+    }
+    Channel* chan = find_channel_name(channelList, buffers[2]);
+    if (chan == 0) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        return ;
+    }
+    std::vector<int>    allOpMember = chan->getAllOpMember();
+    if(*find(allOpMember.begin(), allOpMember.end(), sender.GetUserFd()) != sender.GetUserFd()){
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        return ;
+    }
+    User*    vic = find_member_name(userList, buffers[3]);
+    if(!chan->isInChannel(vic->GetUserFd())) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        return ;
+    }
+    chan->suppMember(sender.GetUserFd(), vic->GetUserFd());
+    return ;
+}
 
 void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
-    std::cout << "You used PART" << std::endl;
-    if (buffers.size() == 2)
+    std::vector<struct s_replie>    replie;
+
+    setReplie(&replie);
+    if (buffers.size() < 2) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[1]);
+        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
-    for(std::vector<Channel *>::iterator it = channelList.begin(); it == channelList.end(); it++) {
-        std::vector<int>    channelMembers = (*it)->getAllMember();
-        if (*find(channelMembers.begin(), channelMembers.end(), sender.GetUserFd()) == sender.GetUserFd())
-            (*it)->memberLeave(sender.GetUserFd());
     }
+    for (std::vector<std::string>::iterator it = buffers.begin() + 2; it != buffers.end(); it++) {
+        Channel* chan = find_channel_name(channelList, *it);
+        if (chan == 0) {
+            std::vector<std::string>    tmp;
+            tmp.push_back(*it);
+            Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        }
+        if(!chan->isInChannel(sender.GetUserFd())){
+            std::vector<std::string>    tmp;
+            tmp.push_back(*it);
+            Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
+        }
+        chan->memberLeave(sender.GetUserFd());
+    }
+    return ;
 }
 
 void    mode(std::vector<std::string> buffers, User& sender) {
     (void)buffers;
     (void)sender;
+    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_CHANOPRIVSNEEDED(482)<channel> ERR_NOSUCHNICK(401)<nickname> ERR_UNKNOWMODE(472)<char> ERR_NOSUCHCHANNEL(403)<channel name> ERR_USERDONTMATCH(502)
+    // replie : RPL_UNMODEIS(221)<user mode string>
     //std::cout << "You are in JOIN" << std::endl;
 }
 
-void    notice(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    //std::cout << "You are in NOTICE" << std::endl;
-}
+void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
+    std::vector<struct s_replie>    replie;
 
-void    topic(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used TOPIC" << std::endl;
+    setReplie(&replie);
+    if (buffers.size() < 2) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[1]);
+        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
+        return ;
+    }
+    Channel* chan = find_channel_name(channelList, buffers[2]);
+    if (chan == 0) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        return ;
+    }
+    if(!chan->isInChannel(sender.GetUserFd())){
+        std::vector<std::string>    tmp;
+        tmp.push_back(chan->getName());
+        Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
+        return ;
+    }
+    std::string topic = chan->getTopic();
+    if (topic == "")
+    {
+        if(buffers.size() >= 3) {
+                std::string topic = 0;
+            for(std::vector<std::string>::iterator it = buffers.begin() + 3; it != buffers.end(); it++)
+               topic += *it; 
+            if (!chan->setTopic(sender.GetUserFd(), topic)) {
+                    std::vector<std::string>    tmp;
+                    tmp.push_back(chan->getName());
+                    Server::sendReplie(tmp , 482, sender.GetUserFd(), replie);
+                    return ;
+            }
+        }
+        std::vector<std::string>    tmp;
+        tmp.push_back(chan->getName());
+        Server::sendReplie(tmp , 331, sender.GetUserFd(), replie);
+    } else {
+        if(buffers.size() >= 3) {
+                std::string topic = 0;
+            for(std::vector<std::string>::iterator it = buffers.begin() + 3; it != buffers.end(); it++)
+               topic += *it; 
+            if (!chan->setTopic(sender.GetUserFd(), topic)) {
+                    std::vector<std::string>    tmp;
+                    tmp.push_back(chan->getName());
+                    Server::sendReplie(tmp , 482, sender.GetUserFd(), replie);
+                    return ;
+            }
+        }
+        std::vector<std::string>    tmp;
+        tmp.push_back(chan->getName());
+        tmp.push_back(topic);
+        Server::sendReplie(tmp , 332, sender.GetUserFd(), replie);
+    }
 }
 
 void    user(std::vector<std::string> buffers, User& sender) {
@@ -122,6 +229,7 @@ void    user(std::vector<std::string> buffers, User& sender) {
     //"332 " + channelName + " :This is the channel topic";
     // argument += "332\r\n"; 
     //sendMessage(sender.GetUserFd(), argument);
+    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_ALREADYREGISTRED(462)
 }
 
 void    quit(std::vector<std::string> buffers, User& sender) {
@@ -130,10 +238,29 @@ void    quit(std::vector<std::string> buffers, User& sender) {
     std::cout << "You used QUIT" << std::endl;
 }
 
-void    nick(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used NICK" << std::endl;
+
+void    nick(std::vector<std::string> buffers, User& sender, std::vector<User*> members) {
+    std::vector<struct s_replie>    replie;
+
+    setReplie(&replie);
+    if (buffers.size() < 2) {
+        std::vector<std::string>    tmp;
+        Server::sendReplie(tmp , 431, sender.GetUserFd(), replie);
+        return ;
+    }
+    if(find_member_name(members, buffers[2])) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[2]);
+        Server::sendReplie(tmp , 433, sender.GetUserFd(), replie);
+        return ;
+    }
+    sender.ChangeNickname(buffers[2]);
+    return ;
+}
+
+void    pass(std::vector<std::string> buffers, User& sender) {
+
+    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_ALREADYREGISTRED(462)
 }
 
 void    sendNoCmd(std::vector<std::string> buffers, User& sender) {
