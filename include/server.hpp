@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: luciefer <luciefer@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/22 03:56:17 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/23 13:56:51 by luciefer         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,7 @@
 # include "irc.hpp"
 # include "Message.hpp"
 
-void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
-
-struct  s_error {
-    int nbError;
-    std::string rplError;
-};
+void    _send(const char* message, int member);
 
 struct  s_replie {
     int nbReplie;
@@ -68,7 +63,6 @@ class Server
 	std::vector<int> clientSockets;
 	std::vector<User*> userList;
 	std::vector<Channel*> channelList;
-    std::vector<struct s_error> _error;
     std::vector<struct s_replie> _replie;
 	
 	public :

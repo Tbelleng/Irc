@@ -30,7 +30,7 @@ void    Channel::setGrade(int member, int grade) {
     if (*find(this->_opMembers.begin(), this->_opMembers.end(), member) == member) {
         this->_topic.setGrade(grade);
     } else {
-        _send("Not an op!", member, this->_epfd, this->_ev);
+        _send("Not an op!", member);
     }
     return ;
 }
@@ -41,7 +41,7 @@ void    Channel::setTopic(int member, std::string topic) {
         if (*find(this->_opMembers.begin(), this->_opMembers.end(), member) == member) {
             this->_topic.setTopic(topic);
         } else {
-            _send("Not an op!", member, this->_epfd, this->_ev);
+            _send("Not an op!", member);
         }
     } else {
         this->_topic.setTopic(topic);
@@ -60,7 +60,7 @@ void    Channel::setOpMember(int oldOpMember, int newOpMember) {
     if (*find(this->_opMembers.begin(), this->_opMembers.end(), oldOpMember) == oldOpMember) {
         this->_opMembers.push_back(newOpMember);
     } else {
-        _send("Not an op!", oldOpMember, this->_epfd, this->_ev);
+        _send("Not an op!", oldOpMember);
     }
     return ;
 }
@@ -76,7 +76,7 @@ void    Channel::suppMember(int opMember, int suppMember) {
             this->_members.end()
         );
     } else {
-        _send("Not an op!", opMember, this->_epfd, this->_ev);
+        _send("Not an op!", opMember);
     }
     return ;
 }
@@ -90,7 +90,7 @@ void    Channel::suppOpMember(int opMember, int suppOpMember) {
             this->_opMembers.end()
         );
     } else {
-        _send("Not an op!", opMember, this->_epfd, this->_ev);
+        _send("Not an op!", opMember);
     }
     return ;
 }
@@ -102,7 +102,7 @@ void    Channel::memberLeave(int leaver) {
             this->_members.end()
         );
     } else {
-        _send("Not an channel member!", leaver, this->_epfd, this->_ev);
+        _send("Not an channel member!", leaver);
     }
     return ;
 }
@@ -114,7 +114,7 @@ std::vector<int> Channel::getAllMember( void ) const {
 void     Channel::sendMessage(const char* message) const {
 
     for(std::vector<int>::const_iterator it = this->_members.begin(); it != this->_members.end(); ++it) {
-        _send(message, *it, this->_epfd, this->_ev); 
+        _send(message, *it); 
     }
     return ;
 }
