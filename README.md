@@ -42,7 +42,7 @@ You should run this command in irssi:
 
 ### Server Implementation
 - [X] Design and implement the IRC server architecture.
-- [ ] Implement server connection and socket handling.
+- [X] Implement server connection and socket handling.
 - [ ] Define and handle IRC commands and messages.
 - [ ] Manage user registration and authentication.
 - [ ] Develop channel management features.
