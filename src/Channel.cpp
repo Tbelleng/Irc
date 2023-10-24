@@ -1,33 +1,35 @@
 #include "server.hpp"
 
-Channel::Channel(int opMember) : _name("Default"), _topic() {
-    this->_opMembers.push_back(opMember);
+
+
+Channel::Channel(int _opMember) : _name("Default"), _topic() {
+    this->_opMembers.push_back(_opMember);
     if (DEBUG_CHANNEL)
         std::cout << "# Default Channel constructor call #" << std::endl;
 }
 
-Channel::Channel(std::string name, int opMember) : _name(name), _topic() {
-    this->_opMembers.push_back(opMember);
+Channel::~Channel(void)
+{
+
+}
+
+Channel::Channel(std::string name, int _opMember) : _name(name), _topic() {
+    this->_opMembers.push_back(_opMember);
     if (DEBUG_CHANNEL)
         std::cout << "# String Channel constructor call #" << std::endl;
 }
 
-Channel::~Channel( void ) {
-    if (DEBUG_CHANNEL)
-        std::cout << "| Default Channel destructor |";
-}
 
-std::string Channel::getName( void ) const {
-    return this->_name;
-}
-
-std::vector<int>    Channel::getAllOpMember(void) const {
-    return this->_opMembers;
-}
-
-std::string Channel::getTopic(void) const {
-    // Channel::sendMessage(this->_topic.getTopic().c_str());
-    return (this->_topic.getTopic());
+bool Channel::isInChannel(int user)
+{
+    // std::string compare = sender.GetUserName();
+    for (std::vector<int>::iterator it = this->_members.begin(); it != this->_members.end(); ++it) 
+    {
+         if (*it == user) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void    Channel::setGrade(int member, int grade) {
@@ -47,16 +49,34 @@ bool    Channel::setTopic(int member, std::string topic) {
         } else {
             return false;
         }
-    } else {
-        this->_topic.setTopic(topic);
     }
     return true;
 }
 
-void    Channel::setMember(int newMember) {
-    this->_members.push_back(newMember);
-    return ;
-}
+// void Channel::sendTo(User& sender, const std::string message)
+// {
+//     send(sender.GetUserFd(), message.c_str(), message.size(), MSG_DONTWAIT);
+//     std::cout << "{info} MESSAGE TO " << sender.GetUserName() << " >" << message << "^" << std::endl;
+// }
+
+// void Channel::sendToChannel(User& sender, std::vector<std::string>buffers)
+// {
+//     std::string message = vectorToString(buffers);
+//     this->sendTo(sender, JOIN(sender.GetUserName(), "user", "localhost", "new_chat"));
+//     //send(sender.GetUserFd(), message.c_str(), message.size(), MSG_DONTWAIT);
+// }
+
+
+// std::string vectorToString(const std::vector<std::string>& buffer) 
+// {
+//     std::string result;
+//     for (size_t i = 0; i < buffer.size(); ++i)
+//     {
+//         result += buffer[i];
+//     }
+//     //result += "\r\n";
+//     return result;
+// }
 
 void    Channel::setOpMember(int oldOpMember, int newOpMember) {
     if (oldOpMember == newOpMember)
@@ -111,10 +131,6 @@ void    Channel::memberLeave(int leaver) {
     return ;
 }
 
-std::vector<int> Channel::getAllMember( void ) const {
-    return this->_members;
-}
-
 void     Channel::sendMessage(const char* message) const {
 
     for(std::vector<int>::const_iterator it = this->_members.begin(); it != this->_members.end(); ++it) {
@@ -123,17 +139,7 @@ void     Channel::sendMessage(const char* message) const {
     return ;
 }
 
-bool Channel::isInChannel(int user)
-{
-    // std::string compare = sender.GetUserName();
-    for (std::vector<int>::iterator it = this->_members.begin(); it != this->_members.end(); ++it) 
-    {
-         if (*it == user) {
-            return true;
-        }
-    }
-    return false;
-}
+
 
 // #include "server.hpp"
 

@@ -7,6 +7,7 @@
 //     }
 //     return 0;
 // }
+//SendMessageTo(client, RPL_JOIN(client->GetNickname(), neededChannels[i_neededChannels]));
 
 void    setReplie(std::vector<struct s_replie>* replie) {
     struct s_replie a;

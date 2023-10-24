@@ -41,7 +41,7 @@ You should run this command in irssi:
 - [X] Create an initial project structure.
 
 ### Server Implementation
-- [ ] Design and implement the IRC server architecture.
+- [X] Design and implement the IRC server architecture.
 - [ ] Implement server connection and socket handling.
 - [ ] Define and handle IRC commands and messages.
 - [ ] Manage user registration and authentication.
