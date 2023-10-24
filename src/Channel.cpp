@@ -1,108 +1,55 @@
 #include "server.hpp"
 
-Channel::Channel(int opMember, int epfd, struct epoll_event& ev) : _name("Default"), _epfd(epfd), _ev(ev), _topic() {
-    this->_opMembers.push_back(opMember);
-    if (DEBUG_CHANNEL)
-        std::cout << "# Default Channel constructor call #" << std::endl;
+Channel::Channel(User& sender, std::string channel_name)
+{
+    this->_name = channel_name;
+    this->_members.push_back(sender.GetUserName());
+    this->_opMembers.push_back(sender.GetUserName());
 }
 
-Channel::Channel(std::string name, int opMember, int epfd, struct epoll_event& ev) : _name(name), _epfd(epfd), _ev(ev), _topic() {
-    this->_opMembers.push_back(opMember);
-    if (DEBUG_CHANNEL)
-        std::cout << "# String Channel constructor call #" << std::endl;
+Channel::~Channel(void)
+{
+
 }
 
-Channel::~Channel( void ) {
-    if (DEBUG_CHANNEL)
-        std::cout << "| Default Channel destructor |";
+std::string Channel::getChannelName(void)
+{
+    return (this->_name);
 }
 
-std::string Channel::getName( void ) const {
-    return this->_name;
-}
-
-std::string Channel::getTopic(void) const {
-    Channel::sendMessage(this->_topic.getTopic().c_str());
-    return (this->_topic.getTopic());
-}
-
-void    Channel::setGrade(int member, int grade) {
-    if (*find(this->_opMembers.begin(), this->_opMembers.end(), member) == member) {
-        this->_topic.setGrade(grade);
-    } else {
-        _send("Not an op!", member, this->_epfd, this->_ev);
-    }
-    return ;
-}
-
-void    Channel::setTopic(int member, std::string topic) {
-    std::cout << this->_topic.getGrade() << std::endl;
-    if (this->_topic.getGrade() == 0){
-        if (*find(this->_opMembers.begin(), this->_opMembers.end(), member) == member) {
-            this->_topic.setTopic(topic);
-        } else {
-            _send("Not an op!", member, this->_epfd, this->_ev);
+bool Channel::isInChannel(User &sender)
+{
+    std::string compare = sender.GetUserName();
+    for (std::vector<std::string>::iterator it = this->_members.begin(); it != this->_members.end(); ++it) 
+    {
+         if (*it == compare) {
+            return true;
         }
-    } else {
-        this->_topic.setTopic(topic);
     }
-    return ;
+    return false;
 }
 
-void    Channel::setMember(int newMember) {
-    this->_members.push_back(newMember);
-    return ;
+void Channel::sendTo(User& sender, const std::string message)
+{
+    send(sender.GetUserFd(), message.c_str(), message.size(), MSG_DONTWAIT);
+    std::cout << "{info} MESSAGE TO " << sender.GetUserName() << " >" << message << "^" << std::endl;
 }
 
-void    Channel::setOpMember(int oldOpMember, int newOpMember) {
-    if (oldOpMember == newOpMember)
-        return ;
-    if (*find(this->_opMembers.begin(), this->_opMembers.end(), oldOpMember) == oldOpMember) {
-        this->_opMembers.push_back(newOpMember);
-    } else {
-        _send("Not an op!", oldOpMember, this->_epfd, this->_ev);
+void Channel::sendToChannel(User& sender, std::vector<std::string>buffers)
+{
+    std::string message = vectorToString(buffers);
+    this->sendTo(sender, JOIN(sender.GetUserName(), "user", "localhost", "new_chat"));
+    //send(sender.GetUserFd(), message.c_str(), message.size(), MSG_DONTWAIT);
+}
+
+
+std::string vectorToString(const std::vector<std::string>& buffer) 
+{
+    std::string result;
+    for (size_t i = 0; i < buffer.size(); ++i)
+    {
+        result += buffer[i];
     }
-    return ;
-}
-
-
-
-void    Channel::suppMember(int opMember, int suppMember) {
-    if (opMember == suppMember)
-        return ;
-    if (*find(this->_opMembers.begin(), this->_opMembers.end(), opMember) == opMember) {
-        this->_members.erase(
-            std::remove(this->_members.begin(), this->_members.end(), suppMember),
-            this->_members.end()
-        );
-    } else {
-        _send("Not an op!", opMember, this->_epfd, this->_ev);
-    }
-    return ;
-}
-
-void    Channel::suppOpMember(int opMember, int suppOpMember) {
-    if (opMember == suppOpMember)
-        return ;
-    if (*find(this->_opMembers.begin(), this->_opMembers.end(), opMember) == opMember) {
-        this->_opMembers.erase(
-            std::remove(this->_opMembers.begin(), this->_opMembers.end(), suppOpMember),
-            this->_opMembers.end()
-        );
-    } else {
-        _send("Not an op!", opMember, this->_epfd, this->_ev);
-    }
-    return ;
-}
-
-std::vector<int> Channel::getAllMember( void ) const {
-    return this->_members;
-}
-
-void     Channel::sendMessage(const char* message) const {
-
-    for(std::vector<int>::const_iterator it = this->_members.begin(); it != this->_members.end(); ++it) {
-        _send(message, *it, this->_epfd, this->_ev); 
-    }
-    return ;
+    //result += "\r\n";
+    return result;
 }

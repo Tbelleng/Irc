@@ -7,6 +7,7 @@
 //     }
 //     return 0;
 // }
+//SendMessageTo(client, RPL_JOIN(client->GetNickname(), neededChannels[i_neededChannels]));
 
 bool    _parcing(std::string buffer, User& sender, std::vector<Channel*> channelList) 
 {

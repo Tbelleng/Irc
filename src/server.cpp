@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/22 07:23:22 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/23 22:28:05 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,182 +29,158 @@ Server::~Server(void)
 {
 	std::cout << "Server Destroyed" << std::endl;
 }
+//*************************************************************************
 
-
-//#This function will init our server as follow :
-//      # Create and Bind the socket to the right port
-//      # Check if there is any error during the connect
-//      # In the loop, listen for any new epoll event like connection
-//          # Or spread message across all clients
-void Server::ServerStart(void)
+void	ft_bzero(void *s, size_t n)
 {
+	while (n > 0)
+	{
+		((char *)s)[n - 1] = 0;
+		n--;
+	}
+}
+
+void	Server::addingPoll(void) 
+{
+    if (_pollfds.empty())
+    {
+
+        struct pollfd server_pollfd;
+        server_pollfd.fd = serverSocket;
+        server_pollfd.events = POLLIN; 
+        server_pollfd.revents = 0;
+       
+        _pollfds.push_back(server_pollfd);
+    } 
+    else
+    {
+       
+        _pollfds[0].fd = serverSocket;
+        _pollfds[0].events = POLLIN;
+        _pollfds[0].revents = 0;
+    }
+
+}
+
+void	Server::createSocket(void) 
+{
+
 	this->serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->serverSocket == -1) 
-    {
-        std::cerr << "Error creating socket" << std::endl;
-        return ;
-    }
-    
-    if (!this->SetSocket(this->port))
-        return ;
+	if (this->serverSocket == -1)
+		std::cerr << "Can't create socket." << std::endl;
+}
 
-    this->epoll_fd = epoll_create(1);
-	if (this->epoll_fd == -1)
+void	Server::binding(sockaddr_in hint) 
+{
+
+	int yes = 1;
+	setsockopt(this->serverSocket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)); 
+	if (bind(this->serverSocket, (sockaddr*)&hint, sizeof(hint)) == -1)
+		std::cerr << "Can't bind to IP/port." << std::endl;
+}
+
+void	Server::listening(void)
+{
+
+	if (listen(this->serverSocket, SOMAXCONN) == -1)
+		std::cerr << "Can't listen." << std::endl;
+	if (this->serverSocket == -1)
+		std::cerr << "error getting listening socket" << std::endl;
+}
+
+void Server::acceptNewClient() 
+{
+    // Create a new User object to represent the incoming client
+    NewConnection new_user;
+
+    // Accept the new client connection
+    int new_socket = accept(this->getSocket(), (struct sockaddr*)&new_user._sockaddr, &new_user._socklen);
+
+    if (new_socket == -1) {
+        perror("accept");
+        return;
+    }
+
+    // Set the new socket for the User
+    new_user.setSocket(new_socket);
+
+    // Print information about the new client
+    std::cout << "New Client " << inet_ntoa(new_user._sockaddr.sin_addr) << ":"
+              << ntohs(new_user._sockaddr.sin_port) << " (" << new_user.getSocket() << ")"
+              << std::endl;
+
+    // Add the new client's socket to the list of file descriptors to poll
+    struct pollfd new_pollfd;
+    new_pollfd.fd = new_user.getSocket();
+    new_pollfd.events = POLLIN;
+    new_pollfd.revents = 0;
+    this->_pollfds.push_back(new_pollfd);
+
+    // Add the new User to the map of connected clients
+    // this->getConnection()[new_pollfd.fd] = new_user;
+}
+
+int     Server::getSocket(void) 
+{
+	return (this->serverSocket);
+}
+
+std::string	    Server::getPassword(void)
+{
+	return (this->password);
+}
+
+void	Server::handleClientRequest(int user_fd)
+{
+    char buf[512];
+	memset(buf, 0, 512);
+	int nbytes = recv(user_fd, buf, sizeof(buf), 0);
+	if (nbytes <= 0)
 	{
-        perror("Error while creating Epoll");
-        return ;
+		// Got error or connection closed by client
+		if (nbytes == 0)
+			std::cout << "pollserver: socket " << user_fd << " hung up" << std::endl;
+		else
+			perror("recv");
+		int sfd = user_fd;
+		close(sfd);
+		//effacer le client ici
 	}
-
-	this->event.data.fd = serverSocket;
-	this->event.events = EPOLLIN;
-
-	
-    if (listen(this->serverSocket, MAX_UTILISATEURS) == -1) 
-    {
-        std::cerr << "Error listening on socket" << std::endl;
-        close(this->serverSocket);
-        return ;
-    }
-
-    std::cout << "Server listening on port " << this->port << std::endl;
-	
-	if (epoll_ctl(this->epoll_fd, EPOLL_CTL_ADD, this->serverSocket, &this->event) == -1) 
+	//build a User here
+	std::string message(buf, 512);
+	if (this->ClientCheck(user_fd) == 0)
 	{
-		perror("Error adding socket");
-        close(this->epoll_fd);
-        close(this->serverSocket);
-        return ;
+	    this->GetUserInfo(user_fd, message);
+        std::cout << "New user Added ! His fd is : " << user_fd << std::endl;
+        std::string responsed = "372 : Welcome to our IRC server !\r\n";
+        send(user_fd, responsed.c_str(), responsed.size(), 0);
 	}
-	
-	this->ServerRun();
-	return ;
+    if (nbytes > 0)
+	{
+		// Handle buffer as a vector of messages
+
+		// If _buff contains \r\n then proceed and empty buff
+		// Else do nothing
+		//std::cout << "I got something, its " << message << std::endl;
+		
+		// client.addToBuffer(buf);
+		// if (!client.getBuffer().empty() && client.getBuffer().find("\r\n") != std::string::npos)
+		// {
+		// 	std::vector<Message>  msgList = this->bufferParser(client.getBuffer().c_str(), client);
+		// 	client.emptyBuffer();
+		// 	if (DEBUG)
+		// 		std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
+		// 	// Execute all messages that could be parsed
+		// 	bool isWelcome = client.getRegistrationStatus();
+		// 	execMultiMsg(msgList);
+		// 	if (!isWelcome)
+		// 		welcome_msg(client);
+		// 	msgList.clear();
+		// }
+	}
+	std::string responsed = "001\r\n";
+    send(user_fd, responsed.c_str(), responsed.size(), 0);
 }
-
-void    Server::ShowUserList(std::vector<User*> userList)
-{
-    for (std::vector<User*>::const_iterator it = userList.begin(); it != userList.end(); ++it)
-    {
-        const User* user = *it;
-        // Access the nickname of each user and print it
-        std::cout << "User Nickname: " << user->GetUserName() << std::endl;
-    }
-}
-
-void Server::ServerRun(void)
-{
-    while (true) 
-    {
-        struct epoll_event events[MAX_UTILISATEURS];
-        int new_event = epoll_wait(this->epoll_fd, events, MAX_UTILISATEURS, -1);
-        if (new_event == -1) 
-        {
-            perror("epoll_wait");
-            return;
-        }
-
-        for (int i = 0; i < new_event; ++i)
-        {
-            if (events[i].events & (EPOLLERR | EPOLLHUP)) {
-                std::cout << "Client disconnected" << std::endl;
-                //iterer dans la liste de user et le vecteur de socket pour effacer User et son fd
-                close(events[i].data.fd);  // Close the socket
-                // Remove the disconnected socket from  data
-            }
-            else if (events[i].data.fd == serverSocket) //New Connection
-            {
-                this->AddingNewClient(epoll_fd, events);
-            }
-            else //Client already connected sending data
-            {
-                //check if this fd exist within users
-                char buffer[512];
-                int bytes_read = recv(events[i].data.fd, buffer, sizeof(buffer), 0);
-                buffer[bytes_read] = '\0';
-                std::string message(buffer, bytes_read);
-                if (this->ClientCheck(events[i].data.fd) == 0)
-                {
-                    this->GetUserInfo(events[i].data.fd, message);
-                    std::cout << "New user Added ! His fd is : " << events[i].data.fd << std::endl;
-                    std::string responsed = "372 : Welcome to our IRC server !\r\n";
-                    send(events[i].data.fd, responsed.c_str(), responsed.size(), 0);
-                }
-                if (bytes_read > 0) 
-                {
-                    User& current_user = this->whichUser(events[i].data.fd);
-                        // Handle messages from clients
-                        // Do 2 parts : If its a command or a regular message
-                    _parcing(message, current_user, this->channelList);
-                } 
-                else 
-                    write(this->clientSockets[i], "Unknown command", 15); // Handle unknown commands
-                std::string responsed = "001\r\n";
-                send(events[i].data.fd, responsed.c_str(), responsed.size(), 0);
-            }
-        }
-    }
-    close(serverSocket);
-}
-
-//**************************** Setters ******************************
-void    Server::SetPort(unsigned int port)
-{
-    this->port = port;
-    return ;
-}
-
-int    Server::SetSocket(unsigned int port)
-{
-    this->SetPort(port);
-    
-    this->serverAddress.sin_family = AF_INET;
-    this->serverAddress.sin_port = htons(this->port);
-    this->serverAddress.sin_addr.s_addr = INADDR_ANY;
-    if (bind(this->serverSocket, (struct sockaddr*)&this->serverAddress, sizeof(this->serverAddress)) == -1) {
-        std::cerr << "Error binding socket" << std::endl;
-        close(this->serverSocket);
-        return 0;
-    }
-    return 1;
-}
-
-//************************************Clients Manager**************************
-
-int    Server::AddingNewClient(int epoll_fd, struct epoll_event* )
-{
-    struct sockaddr_in clientAddress = sockaddr_in();
-    socklen_t clientAddrLen = sizeof(clientAddress);
-    int clientSocket = accept(this->serverSocket, (struct sockaddr*)&clientAddress, &clientAddrLen);
-
-    if (clientSocket == -1)
-    {
-        if (errno != EWOULDBLOCK)
-        {
-            perror("accept");
-            return -1;
-        }
-    }
-    else 
-    {
-        if (fcntl(clientSocket, F_SETFL, O_NONBLOCK) == -1) 
-        {
-            perror("fcntl");
-            return (0);
-        }
-    }
-    
-    clientSockets.push_back(clientSocket);
-    event.events = EPOLLIN | EPOLLRDHUP;
-    event.data.fd = clientSocket;
-    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, clientSocket, &event) == -1)
-    {
-        perror("epoll_ctl");
-        return -1;
-    }
-
-    return 0;
-}
-
-//*********************************Users Manager*************************
 
 int Server::ClientCheck(int user_fd)
 {
@@ -251,19 +227,7 @@ void Server::GetUserInfo(int user_fd, std::string& buffer)
             std::string hostname = line.substr(startPos, endPos - startPos);
         }
     }
+    std::cout << "User info = " << password << " : " << nickname << " : " << username << std::endl;
     User* newUser = new User(nickname, password, username, user_fd);
     this->userList.push_back(newUser);
 }
-
-User& Server::whichUser(int user_fd)
-{
-    for (std::vector<User*>::iterator it = userList.begin(); it != userList.end(); ++it)
-    {
-        if ((*it)->GetUserFd() == user_fd)
-        {
-            return *(*it);
-        }
-    }
-    throw std::runtime_error("User not found");
-}
-

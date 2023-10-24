@@ -72,26 +72,54 @@ bool sendMessage(int user_fd, const std::string& message)
     return true;
 }
 
+Channel* findChannel(std::string& channelName, std::vector<Channel*>& channelList)
+{
+    if (channelList.empty())
+        return NULL;
+    for (std::vector<Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it) {
+        if ((*it)->getChannelName() == channelName) {
+            return *it;
+        }
+    }
+    return NULL; 
+}
+
 void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList)
 {
     // utiliser Channel ici 1/ Veirifier si channel eiste, si non creer une puis partir dans une fonction channel
-    // 
-    (void)channelList;
-    std::string channelName = buffers[1];
+    std::string channel_name = buffers[1];
     
-    if (buffers.size() == 1 || buffers.size() > 2)
+    if (findChannel(channel_name, channelList))
     {
-        std::string argument = "PRIVMSG " + channelName + " :This is the channel topic \r\n";
-        // argument += "332\r\n"; 
-        sendMessage(sender.GetUserFd(), argument);
-        return ;
+        std::cout << "Channel already exist !" << std::endl;
+        //On a trouver la channel, il faut donc entrer direct dedans sans etre operator...etc
+    }
+    else
+    {
+        std::cout << "New Channel created !" << std::endl;
+        Channel* new_channel = new Channel(sender, channel_name);
+        new_channel->sendToChannel(sender, buffers);
     }
     
-    // std::string argument = "PRIVMSG " + channelName + " :Welcome to the channel\r\n";
-    std::string argument = "PRIVMSG " + channelName + " :Welcome to the channel \r\n";
-    sendMessage(sender.GetUserFd(), argument);
+    std::cout << "using JOIN FUNCTION" << std::endl;
+    return ;
     
-    std::cout << "You used JOIN " << channelName << std::endl;
+    // (void)channelList;
+    // std::string channelName = buffers[1];
+    
+    // if (buffers.size() == 1 || buffers.size() > 2)
+    // {
+    //     std::string argument = "PRIVMSG " + channelName + " :This is the channel topic \r\n";
+    //     // argument += "332\r\n"; 
+    //     sendMessage(sender.GetUserFd(), argument);
+    //     return ;
+    // }
+    
+    // // std::string argument = "PRIVMSG " + channelName + " :Welcome to the channel\r\n";
+    // std::string argument = "PRIVMSG " + channelName + " :Welcome to the channel \r\n";
+    // sendMessage(sender.GetUserFd(), argument);
+    
+    // std::cout << "You used JOIN " << channelName << std::endl;
 }
 //********************************************************************
 

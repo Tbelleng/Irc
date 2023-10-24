@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/22 03:56:17 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/23 22:07:29 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,9 @@
 
 # define DEBUG_CHANNEL 0
 # define DEBUG_TOPIC 0
+
 # define RPL_TOPIC 332
+# define JOIN(nick, user, host, channel) (":" + nick + "!" + user + "@" + host + " JOIN :" + channel)
 
 # include <algorithm>
 # include <vector>
@@ -30,17 +32,19 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include <sys/types.h>
-# include <sys/socket.h>
-# include <sys/epoll.h>
+# include <poll.h>
+# include <sys/time.h>
 # include <arpa/inet.h>
 # include <netinet/in.h> 
 # include <vector>
+# include "Connection.hpp"
 # include "Topic.hpp"
-# include "Channel.hpp"
 # include "User.hpp"
+# include "Channel.hpp"
 # include "Pars.hpp"
 # include "irc.hpp"
 # include "Message.hpp"
+
 
 class Server
 {
@@ -49,18 +53,32 @@ class Server
 	std::string password;
 	unsigned int port;
 	int serverSocket;
-	int epoll_fd;
 	struct sockaddr_in serverAddress;
-	struct epoll_event event;
+	//struct epoll_event event;
+	
 	std::vector<int> clientSockets;
 	std::vector<User*> userList;
 	std::vector<Channel*> channelList;
 	
 	public :
 	
+	//new
 	Server(int port, std::string password);
-	~Server(void);
-	void ServerStart(void);
+	~Server(void);	
+	
+	void	createSocket(void);
+	void	binding(sockaddr_in hint);
+	void	listening(void);
+	void	addingPoll(void);
+
+	void	acceptNewClient();
+	void	handleClientRequest(int user_fd);
+	int     getSocket(void);
+	std::string     getPassword(void);
+	
+	std::vector<struct pollfd>	_pollfds;
+	
+	//Old
 	void SetPort(unsigned int port);
 	int  SetSocket(unsigned int port);
 	void ServerRun(void);
