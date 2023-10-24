@@ -51,3 +51,22 @@ int User::GetUserFd()
 {
     return (this->userFd);
 }
+
+void    User::setUser(std::string username, std::string hostname, std::vector<std::string> realname) {
+    this->username = username;
+    this->hostname = hostname;
+    std::string tmp = "";
+    for(std::vector<std::string>::iterator it = realname.begin(); it != realname.end(); it++) {
+        tmp += *it;
+    }
+    return ;
+}
+
+void    User::setNick(std::string nickname) {
+    this->nickname = nickname;
+    return ;
+}
+
+std::string User::GetRealName() const {
+    return this->realname;
+}

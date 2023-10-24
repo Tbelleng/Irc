@@ -160,7 +160,6 @@ void    mode(std::vector<std::string> buffers, User& sender) {
     (void)sender;
     // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_CHANOPRIVSNEEDED(482)<channel> ERR_NOSUCHNICK(401)<nickname> ERR_UNKNOWMODE(472)<char> ERR_NOSUCHCHANNEL(403)<channel name> ERR_USERDONTMATCH(502)
     // replie : RPL_UNMODEIS(221)<user mode string>
-    //std::cout << "You are in JOIN" << std::endl;
 }
 
 void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
@@ -223,13 +222,26 @@ void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channe
 }
 
 void    user(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    //std::string argument = "PRIVMSG : Welcome to our IRC Server !";
-    //"332 " + channelName + " :This is the channel topic";
-    // argument += "332\r\n"; 
-    //sendMessage(sender.GetUserFd(), argument);
-    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_ALREADYREGISTRED(462)
+    std::vector<struct s_replie>    replie;
+
+    setReplie(&replie);
+    if(buffers.size() < 5){
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[1]);
+        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
+        return ;
+    }
+    if (sender.GetRealName() != "") {
+        std::vector<std::string>    tmp;
+        Server::sendReplie(tmp , 462, sender.GetUserFd(), replie);
+        return ;
+    }
+    std::vector<std::string>    realname;
+    for(std::vector<std::string>::iterator it = buffers.begin() + 5; it != buffers.end(); it++) {
+        realname.push_back(*it);
+    }
+    sender.setUser(buffers[2], buffers[3], realname);
+    return ;
 }
 
 void    quit(std::vector<std::string> buffers, User& sender) {

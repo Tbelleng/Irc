@@ -22,6 +22,7 @@ class User
 	std::string hostname;
 	std::string password;
 	std::string username;
+    std::string realname;
 	int userFd;
 	
 	public :
@@ -29,9 +30,12 @@ class User
 	User(std::string& Nickname, std::string& password, std::string&hostname, int user_fd);
 	~User(void);
 	std::string GetUserName(void) const;
+    std::string GetRealName(void) const;
 	void ChangeNickname(std::string new_nickname);
 	std::string GetPassword(void);
 	int GetUserFd();
+    void    setUser(std::string username, std::string hostname, std::vector<std::string> realname);
+    void    setNick(std::string nickname);
 
 };
 
