@@ -62,22 +62,40 @@ Channel* findChannel(std::string& channelName, std::vector<Channel*>& channelLis
         return NULL;
     for (std::vector<Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
     {
-        // if ((*it)->getChannelName() == channelName) {
-        //     return *it;
-        // }
+        if ((*it)->getName() == channelName) 
+        {
+             return *it;
+        }
     }
     return NULL; 
 }
 
 void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList)
 {
-    (void)sender;
-    (void)channelList;
     std::string channel = buffers[1];
-    std::cout << "Le nom de la channel = " << channel << std::endl;
+    std::vector<struct s_replie>    replie;
+
+    setReplie(&replie);
+    if (buffers.size() < 2) {
+        std::vector<std::string>    tmp;
+        tmp.push_back(buffers[0]);
+        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
+        return ;
+    }
+    
+    if (findChannel(channel, channelList)) //La channel existe deja
+    {
+        //enter in this channel
+    }
+    else
+    {
+        Channel* new_channel = new Channel(channel, sender.GetUserFd());
+        (void)new_channel; //send()
+    }
+    
     // utiliser Channel ici 1/ Veirifier si channel eiste, si non creer une puis partir dans une fonction channel
     
-    
+    //attention si nouvelle channel ne pas oublier de la mettre dans channelList
     
     //On a trouver la channel, il faut donc entrer direct dedans sans etre operator...etc
     
@@ -144,7 +162,7 @@ void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel
     setReplie(&replie);
     if (buffers.size() < 2) {
         std::vector<std::string>    tmp;
-        tmp.push_back(buffers[1]);
+        tmp.push_back(buffers[0]);
         Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
     }
