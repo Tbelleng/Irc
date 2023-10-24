@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/12 15:58:09 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/20 17:41:57 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/24 16:17:15 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,6 @@ User::~User(void)
 	return ;
 }
 
-
-std::string User::GetUserName(void) const
-{
-	return (this->nickname);
-}
 
 std::string User::GetPassword(void)
 {
