@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/23 22:07:29 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/24 13:44:33 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <vector>
 # include <map>
 # include <iostream>
+# include <string>
 # include <fcntl.h>
 # include <cstring>
 # include <sstream>
@@ -45,6 +46,12 @@
 # include "irc.hpp"
 # include "Message.hpp"
 
+void    _send(const char* message, int member);
+
+struct  s_replie {
+    int nbReplie;
+    std::string rplReplie;
+};
 
 class Server
 {
@@ -87,12 +94,13 @@ class Server
 	int ClientCheck(int user_fd);
 	void GetUserInfo(int user_fd, std::string& buffer);
 	User& whichUser(int user_fd);
+    static void    sendReplie(std::vector<std::string> buffer, int replie, int socket_client, std::vector<struct s_replie> _replie);
 
 };
 
 
-bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList);
+void    setReplie(std::vector<struct s_replie>* replie);
+bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList, std::vector<User*> userList);
 //User&   getUser(int socket_client);
-void    _send(const char* message, int member, int epfd, struct epoll_event& ev);
 
 #endif

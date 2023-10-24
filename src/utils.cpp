@@ -1,6 +1,5 @@
 #include "irc.hpp"
 
-
 std::vector<std::string>    ft_split(std::string s1, const char token) {
     std::vector<std::string>    buffer;
     std::string                 tmp;
@@ -42,3 +41,10 @@ std::vector<std::string>    ft_split(std::string s1, const char token) {
 //         std::cerr << "Send to client " << member << " timed out." << std::endl;
 //     }
 // }
+void    _send(const char* message, int member) {
+        ssize_t bytesSent = send(member, message, std::strlen(message), 0);
+        if(bytesSent == -1) {
+            std::cerr << "Failed to send message to client: " << member << std::endl;
+            // check si c'est bien securise 
+        }
+}

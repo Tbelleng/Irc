@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/23 22:28:05 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/24 15:12:56 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,28 +158,15 @@ void	Server::handleClientRequest(int user_fd)
     if (nbytes > 0)
 	{
 		// Handle buffer as a vector of messages
+	    std::string responsed = "001\r\n";
+        send(user_fd, responsed.c_str(), responsed.size(), 0);
 
 		// If _buff contains \r\n then proceed and empty buff
 		// Else do nothing
-		//std::cout << "I got something, its " << message << std::endl;
 		
-		// client.addToBuffer(buf);
-		// if (!client.getBuffer().empty() && client.getBuffer().find("\r\n") != std::string::npos)
-		// {
-		// 	std::vector<Message>  msgList = this->bufferParser(client.getBuffer().c_str(), client);
-		// 	client.emptyBuffer();
-		// 	if (DEBUG)
-		// 		std::cout << "[Client] (" << client.getSocket() << ")" << " received buf: " << buf << std::endl;
-		// 	// Execute all messages that could be parsed
-		// 	bool isWelcome = client.getRegistrationStatus();
-		// 	execMultiMsg(msgList);
-		// 	if (!isWelcome)
-		// 		welcome_msg(client);
-		// 	msgList.clear();
-		// }
+		// std::cout << "I got something, its " << message << std::endl;
+		
 	}
-	std::string responsed = "001\r\n";
-    send(user_fd, responsed.c_str(), responsed.size(), 0);
 }
 
 int Server::ClientCheck(int user_fd)
@@ -230,4 +217,58 @@ void Server::GetUserInfo(int user_fd, std::string& buffer)
     std::cout << "User info = " << password << " : " << nickname << " : " << username << std::endl;
     User* newUser = new User(nickname, password, username, user_fd);
     this->userList.push_back(newUser);
+}
+
+User& Server::whichUser(int user_fd)
+{
+    for (std::vector<User*>::iterator it = userList.begin(); it != userList.end(); ++it)
+    {
+        if ((*it)->GetUserFd() == user_fd)
+        {
+            return *(*it);
+        }
+    }
+    throw std::runtime_error("User not found");
+}
+
+std::string find_replie(int replie, std::vector<struct s_replie> _replie) {
+    for (std::vector<struct s_replie>::iterator it = _replie.begin(); it != _replie.end(); it++) {
+        if (it->nbReplie == replie)
+            return it->rplReplie;
+    }
+    return 0;
+}
+
+void    Server::sendReplie(std::vector<std::string> buffer, int replie, int socket_client, std::vector<struct s_replie> _replie) {
+    std::stringstream   ss;
+
+    ss << replie;
+    std::string replie_str = ss.str();
+    if (find_replie(replie, _replie) == "")
+        return ;
+    if (replie == 331 || replie == 368) {
+        std::string str_replie = replie_str + " " + buffer[0] + find_replie(replie, _replie);
+        _send(str_replie.c_str(), socket_client);
+    } else if (replie == 221 || replie == 324){
+        std::string str_replie = replie_str + " ";
+        for(std::vector<std::string>::iterator it = buffer.begin(); it != buffer.end(); it++)
+            str_replie += *it;
+        str_replie += find_replie(replie, _replie);
+        _send(str_replie.c_str(), socket_client);
+    } else if (replie == 301 || replie == 332) {
+        std::string str_replie = replie_str + " " + buffer[0] + find_replie(replie, _replie) + buffer[1] + "\r\n";
+        _send(str_replie.c_str(), socket_client);
+    } else if (replie == 412 || replie == 431 || replie == 462) {
+        std::string str_replie = replie_str + " " + find_replie(replie, _replie);
+        _send(str_replie.c_str(), socket_client);
+        return ;
+    } else if (replie == 411) {
+        std::string str_replie = replie_str + " " + find_replie(replie, _replie) + "(" + buffer[0] + ")\r\n";
+        _send(str_replie.c_str(), socket_client);
+        return ;
+    } else {
+        std::string str_replie = replie_str + " " + buffer[0]  + find_replie(replie, _replie);
+        _send(str_replie.c_str(), socket_client);
+    }
+    return ;
 }
