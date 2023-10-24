@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/24 15:12:56 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/24 16:21:57 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,8 @@ void	Server::handleClientRequest(int user_fd)
     char buf[512];
 	memset(buf, 0, 512);
 	int nbytes = recv(user_fd, buf, sizeof(buf), 0);
+	std::string testing (buf, 512);
+	std::cout << "BUFF = " << testing << std::endl;
 	if (nbytes <= 0)
 	{
 		// Got error or connection closed by client
@@ -152,18 +154,20 @@ void	Server::handleClientRequest(int user_fd)
 	{
 	    this->GetUserInfo(user_fd, message);
         std::cout << "New user Added ! His fd is : " << user_fd << std::endl;
-        std::string responsed = "372 : Welcome to our IRC server !\r\n";
-        send(user_fd, responsed.c_str(), responsed.size(), 0);
+        User& sender = this->whichUser(user_fd);
+        std::string message = ":" + sender.GetUserName() + " 001 " + sender.getNickname() + " " + ":Welcome to the our Server, " + "\r\n";
+        send(user_fd, message.c_str(), message.size(), MSG_DONTWAIT);	
 	}
     if (nbytes > 0)
 	{
 		// Handle buffer as a vector of messages
-	    std::string responsed = "001\r\n";
-        send(user_fd, responsed.c_str(), responsed.size(), 0);
+	    // std::string responsed = "001\r\n";
+        // send(user_fd, responsed.c_str(), responsed.size(), 0);
 
 		// If _buff contains \r\n then proceed and empty buff
 		// Else do nothing
-		
+		User& sender = this->whichUser(user_fd);
+		_parcing(message, sender, this->channelList, this->userList);
 		// std::cout << "I got something, its " << message << std::endl;
 		
 	}

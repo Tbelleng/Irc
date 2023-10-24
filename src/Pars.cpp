@@ -71,9 +71,10 @@ Channel* findChannel(std::string& channelName, std::vector<Channel*>& channelLis
 
 void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList)
 {
-    (void)buffers;
     (void)sender;
     (void)channelList;
+    std::string channel = buffers[1];
+    std::cout << "Le nom de la channel = " << channel << std::endl;
     // utiliser Channel ici 1/ Veirifier si channel eiste, si non creer une puis partir dans une fonction channel
     
     
