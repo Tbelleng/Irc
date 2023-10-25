@@ -44,17 +44,20 @@ class Channel
 
 	bool isInChannel(User &sender);
 
-	std::string vectorToString(const std::vector<std::string> &strVector);
-
+	void                addMember(User& client);
     void                suppMember(int opMember, int suppMember);
     void                suppOpMember(int opMember, int suppOpMember);
     void                memberLeave(int leaver);
 
-    void                 sendMessage(const char* message) const;
+	void                spreadMsg(User& sender, std::string channe_name, std::vector<std::string> message);
+    void                sendMessage(const char* message) const;
+    int                 getSpecificMember(void);
 
 	bool                isInChannel(int user);
 
 };
+
+std::string vectorToString(const std::vector<std::string> &strVector);
 
 #endif
 // #ifndef CHANNEL_HPP

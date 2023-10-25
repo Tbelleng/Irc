@@ -19,6 +19,8 @@ Command parseCommand(const std::string& cmd) {
         return QUIT;
     } else if (cmd == "NICK") {
         return NICK;
+    } else if (cmd == "PRIVMSG") {
+        return PRIVMSG;
     }
     return UNKNOWN;
 }
@@ -56,21 +58,21 @@ bool sendMessage(int user_fd, const std::string& message)
 
 Channel* findChannel(std::string& channelName, std::vector<Channel*>& channelList)
 {
-    (void)channelName;
-    (void)channelList;
     if (channelList.empty())
+    {
         return NULL;
+    }
     for (std::vector<Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
     {
         if ((*it)->getName() == channelName) 
         {
-             return *it;
+            return *it;
         }
     }
     return NULL; 
 }
 
-void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList)
+void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*>& channelList)
 {
     std::string channel = buffers[1];
     std::vector<struct s_replie>    replie;
@@ -82,10 +84,17 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
         Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
     }
-    
-    if (findChannel(channel, channelList)) //La channel existe deja
+    Channel* channel_check = findChannel(channel, channelList);
+    if (channel_check != NULL) //La channel existe deja
     {
-        //enter in this channel
+        std::cout << "Channel already exist !\n" << std::endl;
+        channel_check->addMember(sender);
+        std::string topic_message = RPL_TOPIC(sender.getNickname(), channel_check->getName());
+        send(sender.GetUserFd(), topic_message.c_str(), topic_message.size(), MSG_DONTWAIT);
+        std::string name_display = RPL_NAMREPLY(sender.getNickname(), "=", channel_check->getName(), sender.getNickname());
+        send(sender.GetUserFd(), name_display.c_str(), name_display.size(), MSG_DONTWAIT);
+        std::string end_name = RPL_ENDOFNAMES(sender.getNickname(), channel_check->getName());
+        send(sender.GetUserFd(), end_name.c_str(), end_name.size(), MSG_DONTWAIT);
     }
     else
     {
@@ -97,17 +106,13 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
         send(sender.GetUserFd(), name_display.c_str(), name_display.size(), MSG_DONTWAIT);
         std::string end_name = RPL_ENDOFNAMES(sender.getNickname(), new_channel->getName());
         send(sender.GetUserFd(), end_name.c_str(), end_name.size(), MSG_DONTWAIT);
+        channelList.push_back(new_channel);
+        std::cout << "Channel added to the list" << std::endl;
     }
     
-    // utiliser Channel ici 1/ Veirifier si channel eiste, si non creer une puis partir dans une fonction channel
+    // utiliser Channel ici 1/ Veirifier si channel existe, si non creer une puis partir dans une fonction channel
     
     //attention si nouvelle channel ne pas oublier de la mettre dans channelList
-    
-    //On a trouver la channel, il faut donc entrer direct dedans sans etre operator...etc
-    
-   
-        //Channel* new_channel = new Channel(sender, channel_name);
-    
 }
 //********************************************************************
 
@@ -254,6 +259,21 @@ void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channe
         tmp.push_back(topic);
         Server::sendReplie(tmp , 332, sender.GetUserFd(), replie);
     }
+}
+void    privmsg(std::vector<std::string> buffers, User& sender, std::vector<Channel*>& channelList)
+{
+    if (buffers.size() > 2)
+    {
+        std::string channel = buffers[1];
+        Channel* channel_check = findChannel(channel, channelList);
+        std::string msg = RPL_AWAY(channel_check->getName(), buffers[2]);
+        channel_check->spreadMsg(sender, channel, buffers);
+        
+        //std::string end_name = RPL_ENDOFNAMES(sender.getNickname(), new_channel->getName());
+        //send(sender.GetUserFd(), name_display.c_str(), name_display.size(), MSG_DONTWAIT);
+    }
+    else
+        return ;
 }
 
 void    user(std::vector<std::string> buffers, User& sender) {

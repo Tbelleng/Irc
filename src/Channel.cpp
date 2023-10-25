@@ -15,6 +15,7 @@ Channel::~Channel(void)
 
 Channel::Channel(std::string name, int _opMember) : _name(name), _topic() {
     this->_opMembers.push_back(_opMember);
+    this->_members.push_back(_opMember);
     this->_topic.setTopic("General Topic");
     if (DEBUG_CHANNEL)
         std::cout << "# String Channel constructor call #" << std::endl;
@@ -120,6 +121,12 @@ void    Channel::suppOpMember(int opMember, int suppOpMember) {
     return ;
 }
 
+void    Channel::addMember(User& client)
+{
+    this->_members.push_back(client.GetUserFd());
+    return ;
+}
+
 void    Channel::memberLeave(int leaver) {
     if (*find(this->_members.begin(), this->_members.end(), leaver) == leaver) {
         this->_members.erase(
@@ -128,6 +135,20 @@ void    Channel::memberLeave(int leaver) {
         );
     } else {
         _send("Not an channel member!", leaver);
+    }
+    return ;
+}
+
+void    Channel::spreadMsg(User& sender, std::string channel_name, std::vector<std::string> message)
+{
+    std::string from_vector = vectorToString(message);
+    std::string replie = RPL_AWAY(channel_name, from_vector);
+    for(std::vector<int>::const_iterator it = this->_members.begin(); it != this->_members.end(); ++it) 
+    {
+        if ((*it) != sender.GetUserFd())
+        {
+            send((*it), replie.c_str(), replie.size(), MSG_DONTWAIT);
+        }
     }
     return ;
 }
@@ -187,14 +208,14 @@ void     Channel::sendMessage(const char* message) const {
 // }
 
 
-// std::string vectorToString(const std::vector<std::string>& buffer) 
-// {
-//     std::string result;
-//     for (size_t i = 0; i < buffer.size(); ++i)
-//     {
-//         result += buffer[i];
-//     }
-//     //result += "\r\n";
-//     return result;
-// }
+std::string vectorToString(const std::vector<std::string>& buffer) 
+{
+    std::string result;
+    for (size_t i = 2; i < buffer.size(); ++i)
+    {
+        result += buffer[i];
+    }
+    //result += "\r\n";
+    return result;
+}
 
