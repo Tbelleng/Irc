@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/24 16:41:48 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/25 15:22:25 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ void	Server::handleClientRequest(int user_fd)
 	    this->GetUserInfo(user_fd, message);
         std::cout << "New user Added ! His fd is : " << user_fd << std::endl;
         User& sender = this->whichUser(user_fd);
-        std::string message = ":" + sender.GetUserName() + " 001 " + sender.getNickname() + " " + ":Welcome to the our Server ! You are Live on Luciefer, Hel-Kame, Tbelleng Network " + "\r\n";
+        std::string message = ":" + sender.GetUserName() + " 001 " + sender.getNickname() + " " + ":Welcome to our Server ! You are Live on Luciefer, Hel-Kame, Tbelleng Network " + "\r\n";
         send(user_fd, message.c_str(), message.size(), MSG_DONTWAIT);	
 	}
     if (nbytes > 0)

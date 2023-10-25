@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/24 13:44:33 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/25 15:19:22 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,10 @@
 # define DEBUG_CHANNEL 0
 # define DEBUG_TOPIC 0
 
-# define RPL_TOPIC 332
 # define JOIN(nick, user, host, channel) (":" + nick + "!" + user + "@" + host + " JOIN :" + channel)
+# define RPL_TOPIC(nickname, channel_name) (std::string(":" " 332 " + nickname + " " + channel_name + " :<topic>" + "\r\n").c_str())
+# define RPL_NAMREPLY(nickname, chansymbol, channel_name, members) (std::string (":" " 353 " + nickname + " " + chansymbol + " " + channel_name + " :" + members + " \r\n"))
+# define RPL_ENDOFNAMES(nickname, channel_name) (std::string(":" " 366 " + nickname + " " + channel_name + " :End of /NAMES list" + "\r\n"))
 
 # include <algorithm>
 # include <vector>
@@ -102,5 +104,6 @@ class Server
 void    setReplie(std::vector<struct s_replie>* replie);
 bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList, std::vector<User*> userList);
 //User&   getUser(int socket_client);
+
 
 #endif

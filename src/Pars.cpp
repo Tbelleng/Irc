@@ -90,7 +90,13 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
     else
     {
         Channel* new_channel = new Channel(channel, sender.GetUserFd());
-        (void)new_channel; //send()
+        std::cout << "New Channel Joined : " << new_channel->getName() << std::endl;
+        std::string topic_message = RPL_TOPIC(sender.getNickname(), new_channel->getName());
+        send(sender.GetUserFd(), topic_message.c_str(), topic_message.size(), MSG_DONTWAIT);
+        std::string name_display = RPL_NAMREPLY(sender.getNickname(), "=", new_channel->getName(), sender.getNickname());
+        send(sender.GetUserFd(), name_display.c_str(), name_display.size(), MSG_DONTWAIT);
+        std::string end_name = RPL_ENDOFNAMES(sender.getNickname(), new_channel->getName());
+        send(sender.GetUserFd(), end_name.c_str(), end_name.size(), MSG_DONTWAIT);
     }
     
     // utiliser Channel ici 1/ Veirifier si channel eiste, si non creer une puis partir dans une fonction channel

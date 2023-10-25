@@ -15,6 +15,7 @@ Channel::~Channel(void)
 
 Channel::Channel(std::string name, int _opMember) : _name(name), _topic() {
     this->_opMembers.push_back(_opMember);
+    this->_topic.setTopic("General Topic");
     if (DEBUG_CHANNEL)
         std::cout << "# String Channel constructor call #" << std::endl;
 }
