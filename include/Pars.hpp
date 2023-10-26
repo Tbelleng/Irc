@@ -14,13 +14,14 @@ enum Command {
     USER,
     QUIT,
     NICK,
+    PRIVMSG,
     NOTICE,
     UNKNOWN
 };
 
 Command parseCommand(const std::string& cmd);
 
-void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList);
+void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*>& channelList);
 void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList, std::vector<User*> userList);
 void    invite(std::vector<std::string> buffers, User& sender);
 void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList);
@@ -30,6 +31,7 @@ void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channe
 void    user(std::vector<std::string> buffers, User& sender);
 void    quit(std::vector<std::string> buffers, User& sender);
 void    nick(std::vector<std::string> buffers, User& sender, std::vector<User*> members);
+void    privmsg(std::vector<std::string> buffers, User& sender, std::vector<Channel*>& channelList);
 void    notice(std::vector<std::string> buffers, User& sender);
 void    sendNoCmd(std::vector<std::string> buffers, User& sender);
 

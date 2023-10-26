@@ -81,7 +81,7 @@ void    setReplie(std::vector<struct s_replie>* replie) {
     a.rplReplie = ":You're not channel operator\r\n";
 }
 
-bool    _parcing(std::string buffer, User& sender, std::vector<Channel*> channelList, std::vector<User*> userList)
+bool    _parcing(std::string buffer, User& sender, std::vector<Channel*>& channelList, std::vector<User*>& userList)
 {
     
     std::vector<std::string>    buffers = ft_split(buffer, ' '); 
@@ -100,6 +100,8 @@ bool    _parcing(std::string buffer, User& sender, std::vector<Channel*> channel
         case JOIN:
             join(buffers, sender, channelList);
             break;
+        case PRIVMSG:
+            privmsg(buffers, sender, channelList);
         case TOPIC:
             topic(buffers, sender, channelList);
             break;
