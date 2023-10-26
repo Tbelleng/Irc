@@ -40,7 +40,7 @@ std::vector<std::string>    ft_split(std::string s1, const char token) {
 //     } else {
 //         std::cerr << "Send to client " << member << " timed out." << std::endl;
 //     }
-// }
+
 void    _send(const char* message, int member) {
         ssize_t bytesSent = send(member, message, std::strlen(message), 0);
         if(bytesSent == -1) {
