@@ -4,6 +4,7 @@
 
 Channel::Channel(int _opMember) : _name("Default"), _topic() {
     this->_opMembers.push_back(_opMember);
+    this->_members.push_back(_opMember);
     if (DEBUG_CHANNEL)
         std::cout << "# Default Channel constructor call #" << std::endl;
 }
@@ -25,9 +26,10 @@ Channel::Channel(std::string name, int _opMember) : _name(name), _topic() {
 bool Channel::isInChannel(int user)
 {
     // std::string compare = sender.GetUserName();
-    for (std::vector<int>::iterator it = this->_members.begin(); it != this->_members.end(); ++it) 
-    {
-         if (*it == user) {
+        std::cout << this->_members.size();
+    if(!this->_members.empty()) {
+        std::vector<int>::iterator it = find(this->_members.begin(), this->_members.end(), user);
+        if (it != this->_members.end()){
             return true;
         }
     }

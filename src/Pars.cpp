@@ -124,11 +124,11 @@ User*     find_member_name(std::vector<User*> userList, std::string member_name)
     return 0;
 }
 
-Channel*     find_channel_name(std::vector<Channel*> channelList, std::string channel_name) {
+Channel*     find_channel_name(std::vector<Channel*>& channelList, std::string channel_name) {
     for(std::vector<Channel*>::iterator it = channelList.begin(); it != channelList.end(); it++) {
-        std::cout << "test\n";
-        if((*it)->getName() == channel_name)
+        if((*it)->getName() == channel_name){
             return *it;
+        }
     }
     return 0;
 }
@@ -168,29 +168,31 @@ void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel
     return ;
 }
 
-void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
+void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> &channelList) {
     std::vector<struct s_replie>    replie;
 
     setReplie(&replie);
-    if (buffers.size() < 3) {
+    if (buffers.size() < 2) {
         std::vector<std::string>    tmp;
         tmp.push_back(buffers[0]);
         Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
     }
     for (std::vector<std::string>::iterator it = buffers.begin() + 2; it != buffers.end(); it++) {
-        Channel* chan = find_channel_name(channelList, *it);
-        if (chan == 0) {
+        std::string str = *it;
+        str.erase(0,1);
+        str = "#" + str;
+        Channel* chan = findChannel(str, channelList);
+        if (!chan) {
             std::vector<std::string>    tmp;
-            tmp.push_back(*it);
+            tmp.push_back(str);
             Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
-        }
-        if(!chan->isInChannel(sender.GetUserFd())){
+        } else if(!chan->isInChannel(sender.GetUserFd())){
             std::vector<std::string>    tmp;
-            tmp.push_back(*it);
+            tmp.push_back(str);
             Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
-        }
-        chan->memberLeave(sender.GetUserFd());
+        } else 
+            chan->memberLeave(sender.GetUserFd());
     }
     return ;
 }

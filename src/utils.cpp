@@ -5,8 +5,10 @@ std::vector<std::string>    ft_split(std::string s1, const char token) {
     std::string                 tmp;
     
     for (uint i = 0; i < s1.size(); i++) {
-        if (s1[i] != token)
-            tmp += s1[i];
+        if (s1[i] != token) {
+            if (s1[i] != '\n' && s1[i] != '\r')
+                tmp += s1[i];
+        }
         else if (!tmp.empty()){
             buffer.push_back(tmp);
             tmp.clear();
@@ -16,7 +18,6 @@ std::vector<std::string>    ft_split(std::string s1, const char token) {
     if (!tmp.empty()) {
         buffer.push_back(tmp);
     }
-    
     return buffer;
 }
 
