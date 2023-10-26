@@ -13,7 +13,7 @@ Command parseCommand(const std::string& cmd) {
         return PASS;
     } else if (cmd == "TOPIC") {
         return TOPIC;
-    } else if (cmd == "USER") {
+    } else if (cmd == "userhost") {
         return USER;
     } else if (cmd == "QUIT") {
         return QUIT;
@@ -71,9 +71,10 @@ Channel* findChannel(std::string& channelName, std::vector<Channel*>& channelLis
 
 void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList)
 {
-    (void)buffers;
     (void)sender;
     (void)channelList;
+    std::string channel = buffers[1];
+    std::cout << "Le nom de la channel = " << channel << std::endl;
     // utiliser Channel ici 1/ Veirifier si channel eiste, si non creer une puis partir dans une fonction channel
     
     
@@ -96,6 +97,7 @@ User*     find_member_name(std::vector<User*> userList, std::string member_name)
 
 Channel*     find_channel_name(std::vector<Channel*> channelList, std::string channel_name) {
     for(std::vector<Channel*>::iterator it = channelList.begin(); it != channelList.end(); it++) {
+        std::cout << "test\n";
         if((*it)->getName() == channel_name)
             return *it;
     }
@@ -141,9 +143,9 @@ void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel
     std::vector<struct s_replie>    replie;
 
     setReplie(&replie);
-    if (buffers.size() < 2) {
+    if (buffers.size() < 3) {
         std::vector<std::string>    tmp;
-        tmp.push_back(buffers[1]);
+        tmp.push_back(buffers[0]);
         Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
     }
@@ -236,8 +238,9 @@ void    user(std::vector<std::string> buffers, User& sender) {
     setReplie(&replie);
     if(buffers.size() < 5){
         std::vector<std::string>    tmp;
-        tmp.push_back(buffers[1]);
+        tmp.push_back(buffers[0]);
         Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
+        std::cout << "test\n";
         return ;
     }
     if (sender.GetRealName() != "") {
