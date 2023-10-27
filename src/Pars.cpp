@@ -156,7 +156,6 @@ void    part(std::vector<std::string> buffers, User& sender, std::map<std::strin
             continue ;
         }
         if(!chan->isInChannel(sender.GetUserFd())){
-            std::cout << "TEST: " << std::endl;
             std::vector<std::string>    tmp;
             tmp.push_back(*it);
             Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
