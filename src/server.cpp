@@ -290,14 +290,11 @@ User*     Server::findMemberName( std::map<int, User*> userList, std::string mem
     return NULL;
 }
 
-Channel* Server::findChannel(std::string& channelName, std::vector<Channel*>& channelList)
+Channel* Server::findChannel(std::string& channelName, std::map<std::string, Channel*>& channelList)
 {
     if (channelList.empty())
         return NULL;
-    for (std::vector<Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
-    {
-        if ((*it)->getName() == channelName) 
-            return *it;
-    }
-    return NULL; 
+    if(channelList.find(channelName) == channelList.end())
+        return NULL; 
+    return channelList[channelName];
 }

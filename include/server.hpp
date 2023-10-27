@@ -29,7 +29,7 @@ class Server
 	int serverSocket;
 	struct sockaddr_in serverAddress;
 	std::map<int, User*> userList;
-	std::vector<Channel*> channelList;
+	std::map<std::string, Channel*> channelList;
 	
 	public :
 	
@@ -60,11 +60,11 @@ class Server
 	User& whichUser(int user_fd);
     static void    sendReplie(std::vector<std::string> buffer, int replie, int socket_client, std::vector<struct s_replie> _replie);
     static User*   findMemberName(std::map<int, User*> userList, std::string member_name);
-    static Channel* findChannel(std::string& channelName, std::vector<Channel*>& channelList);
+    static Channel* findChannel(std::string& channelName, std::map<std::string, Channel*>& channelList);
 
 };
 
 void    setReplie(std::vector<struct s_replie>* replie);
-bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList, std::vector<User*> userList);
+bool    _parcing(std::string buffer, User* sender, std::map<std::string, Channel*> channelList, std::vector<User*> userList);
 
 #endif
