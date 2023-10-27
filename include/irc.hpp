@@ -10,6 +10,7 @@
 # define RPL_NAMREPLY(nickname, chansymbol, channel_name, members) (std::string (":" " 353 " + nickname + " " + chansymbol + " " + channel_name + " :" + members + " \r\n"))
 # define RPL_ENDOFNAMES(nickname, channel_name) (std::string(":" " 366 " + nickname + " " + channel_name + " :End of /NAMES list" + "\r\n"))
 # define RPL_AWAY(chan_nickname, message) (std::string(":" " 301 " + chan_nickname + " :" + message + "\r\n"))
+# define ERR_NOSUCHCHANNEL(nick, channel) (": 403 " + nick + " " + channel + " :No such channel\r\n")
 
 # include <algorithm>
 # include <vector>
