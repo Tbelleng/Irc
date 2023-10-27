@@ -1,6 +1,7 @@
 #include "Pars.hpp"
 
 Command parseCommand(const std::string& cmd) {
+    //std::cout << "On Va faire la commande" << cmd << std::endl;
     if (cmd == "MODE") {
         return MODE;
     } else if (cmd == "KICK") {
@@ -56,6 +57,15 @@ bool sendMessage(int user_fd, const std::string& message)
     return true;
 }
 
+bool isFirstCharHash(const std::string& channel)
+{
+    if (!channel.empty() && channel[0] == '#') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void    join(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
 {
     std::string channel = buffers[1];
@@ -68,6 +78,14 @@ void    join(std::vector<std::string> buffers, User& sender, std::map<std::strin
         Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
     }
+    
+    if (!isFirstCharHash(channel))
+    {
+        std::string error = ERR_BADCHANMASK(channel);
+        send(sender.GetUserFd(), error.c_str(), error.size(), MSG_DONTWAIT);
+        return ;
+    }
+    
     Channel* channel_check = Server::findChannel(channel, channelList);
     if (channel_check != NULL) //La channel existe deja
     {
