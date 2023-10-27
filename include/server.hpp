@@ -13,43 +13,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-# define DEBUG_CHANNEL 0
-# define DEBUG_TOPIC 0
-
-# define JOIN(nick, user, host, channel) (":" + nick + "!" + user + "@" + host + " JOIN :" + channel)
-# define RPL_TOPIC(nickname, channel_name) (std::string(":" " 332 " + nickname + " " + channel_name + " :<topic>" + "\r\n").c_str())
-# define RPL_NAMREPLY(nickname, chansymbol, channel_name, members) (std::string (":" " 353 " + nickname + " " + chansymbol + " " + channel_name + " :" + members + " \r\n"))
-# define RPL_ENDOFNAMES(nickname, channel_name) (std::string(":" " 366 " + nickname + " " + channel_name + " :End of /NAMES list" + "\r\n"))
-# define RPL_AWAY(chan_nickname, message) (std::string(":" " 301 " + chan_nickname + " :" + message + "\r\n"))
-
-# include <algorithm>
-# include <vector>
-# include <map>
-# include <iostream>
-# include <string>
-# include <fcntl.h>
-# include <cstring>
-# include <sstream>
-# include <stdio.h>
-# include <iomanip>
-# include <errno.h>
-# include <fcntl.h>
-# include <unistd.h>
-# include <sys/types.h>
-# include <poll.h>
-# include <sys/time.h>
-# include <arpa/inet.h>
-# include <netinet/in.h> 
-# include <vector>
-# include "Connection.hpp"
-# include "Topic.hpp"
-# include "User.hpp"
-# include "Channel.hpp"
-# include "Pars.hpp"
 # include "irc.hpp"
-# include "Message.hpp"
-
-void    _send(const char* message, int member);
 
 struct  s_replie {
     int nbReplie;
@@ -64,10 +28,7 @@ class Server
 	unsigned int port;
 	int serverSocket;
 	struct sockaddr_in serverAddress;
-	//struct epoll_event event;
-	
-	std::vector<int> clientSockets;
-	std::vector<User*> userList;
+	std::map<int, User*> userList;
 	std::vector<Channel*> channelList;
 	
 	public :
@@ -98,13 +59,12 @@ class Server
 	void GetUserInfo(int user_fd, std::string& buffer);
 	User& whichUser(int user_fd);
     static void    sendReplie(std::vector<std::string> buffer, int replie, int socket_client, std::vector<struct s_replie> _replie);
+    static User*   findMemberName(std::map<int, User*> userList, std::string member_name);
+    static Channel* findChannel(std::string& channelName, std::vector<Channel*>& channelList);
 
 };
 
-
 void    setReplie(std::vector<struct s_replie>* replie);
 bool    _parcing(std::string buffer, User* sender, std::vector<Channel*> channelList, std::vector<User*> userList);
-//User&   getUser(int socket_client);
-
 
 #endif

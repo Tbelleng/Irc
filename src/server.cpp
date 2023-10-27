@@ -173,21 +173,10 @@ void	Server::handleClientRequest(int user_fd)
 	}
 }
 
-int Server::ClientCheck(int user_fd)
-{
-    if (userList.empty())
-    {
+int Server::ClientCheck(int user_fd) {
+    if (this->userList.find(user_fd) == this->userList.end())
         return 0;
-    }
-    
-    for (std::vector<User*>::iterator it = userList.begin(); it != userList.end(); ++it)
-    {
-        if ((*it)->GetUserFd() == user_fd)
-        {
-            return 1;
-        }
-    }
-    return 0;
+    return 1;
 }
 
 void Server::GetUserInfo(int user_fd, std::string& buffer)
@@ -220,20 +209,10 @@ void Server::GetUserInfo(int user_fd, std::string& buffer)
     }
     std::cout << "User info = " << password << " : " << nickname << " : " << username << std::endl;
     User* newUser = new User(nickname, password, username, user_fd);
-    this->userList.push_back(newUser);
+    this->userList.insert(std::pair<int, User*>(user_fd, newUser));
 }
 
-User& Server::whichUser(int user_fd)
-{
-    for (std::vector<User*>::iterator it = userList.begin(); it != userList.end(); ++it)
-    {
-        if ((*it)->GetUserFd() == user_fd)
-        {
-            return *(*it);
-        }
-    }
-    throw std::runtime_error("User not found");
-}
+User& Server::whichUser(int user_fd) {return *this->userList[user_fd];}
 
 std::string find_replie(int replie, std::vector<struct s_replie> _replie) {
     for (std::vector<struct s_replie>::iterator it = _replie.begin(); it != _replie.end(); it++) {
@@ -275,4 +254,26 @@ void    Server::sendReplie(std::vector<std::string> buffer, int replie, int sock
         _send(str_replie.c_str(), socket_client);
     }
     return ;
+}
+
+User*     Server::findMemberName( std::map<int, User*> userList, std::string member_name) {
+    if (userList.empty())
+        return NULL;
+    for(std::map<int, User*>::iterator it = userList.begin(); it != userList.end(); it++) {
+        if(it->second->GetUserName() == member_name)
+            return it->second;
+    }
+    return NULL;
+}
+
+Channel* Server::findChannel(std::string& channelName, std::vector<Channel*>& channelList)
+{
+    if (channelList.empty())
+        return NULL;
+    for (std::vector<Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
+    {
+        if ((*it)->getName() == channelName) 
+            return *it;
+    }
+    return NULL; 
 }

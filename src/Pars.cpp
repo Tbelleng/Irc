@@ -56,22 +56,6 @@ bool sendMessage(int user_fd, const std::string& message)
     return true;
 }
 
-Channel* findChannel(std::string& channelName, std::vector<Channel*>& channelList)
-{
-    if (channelList.empty())
-    {
-        return NULL;
-    }
-    for (std::vector<Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
-    {
-        if ((*it)->getName() == channelName) 
-        {
-            return *it;
-        }
-    }
-    return NULL; 
-}
-
 void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*>& channelList)
 {
     std::string channel = buffers[1];
@@ -84,7 +68,7 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
         Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
     }
-    Channel* channel_check = findChannel(channel, channelList);
+    Channel* channel_check = Server::findChannel(channel, channelList);
     if (channel_check != NULL) //La channel existe deja
     {
         std::cout << "Channel already exist !\n" << std::endl;
@@ -116,23 +100,7 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
 }
 //********************************************************************
 
-User*     find_member_name(std::vector<User*> userList, std::string member_name) {
-    for(std::vector<User*>::iterator it = userList.begin(); it != userList.end(); it++) {
-        if((*it)->GetUserName() == member_name)
-            return *it;
-    }
-    return 0;
-}
-
-Channel*     find_channel_name(std::vector<Channel*> channelList, std::string channel_name) {
-    for(std::vector<Channel*>::iterator it = channelList.begin(); it != channelList.end(); it++) {
-        if((*it)->getName() == channel_name)
-            return *it;
-    }
-    return 0;
-}
-
-void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList, std::vector<User*> userList) {
+void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList,  std::map<int, User*> userList) {
     std::vector<struct s_replie>    replie;
 
     setReplie(&replie);
@@ -142,7 +110,7 @@ void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel
         Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
     }
-    Channel* chan = find_channel_name(channelList, buffers[2]);
+    Channel* chan = Server::findChannel(buffers[2], channelList);
     if (chan == 0) {
         std::vector<std::string>    tmp;
         tmp.push_back(buffers[2]);
@@ -156,7 +124,7 @@ void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel
         Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
         return ;
     }
-    User*    vic = find_member_name(userList, buffers[3]);
+    User*    vic = Server::findMemberName(userList, buffers[3]);
     if(!chan->isInChannel(vic->GetUserFd())) {
         std::vector<std::string>    tmp;
         tmp.push_back(buffers[2]);
@@ -178,7 +146,7 @@ void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel
         return ;
     }
     for (std::vector<std::string>::iterator it = buffers.begin() + 2; it != buffers.end(); it++) {
-        Channel* chan = find_channel_name(channelList, *it);
+        Channel* chan = Server::findChannel(*it, channelList);
         if (chan == 0) {
             std::vector<std::string>    tmp;
             tmp.push_back(*it);
@@ -212,7 +180,7 @@ void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channe
         Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
         return ;
     }
-    Channel* chan = find_channel_name(channelList, buffers[2]);
+    Channel* chan = Server::findChannel(buffers[2], channelList);
     if (chan == 0) {
         std::vector<std::string>    tmp;
         tmp.push_back(buffers[2]);
@@ -265,7 +233,7 @@ void    privmsg(std::vector<std::string> buffers, User& sender, std::vector<Chan
     if (buffers.size() > 2)
     {
         std::string channel = buffers[1];
-        Channel* channel_check = findChannel(channel, channelList);
+        Channel* channel_check = Server::findChannel(channel, channelList);
         std::string msg = RPL_AWAY(channel_check->getName(), buffers[2]);
         channel_check->spreadMsg(sender, channel, buffers);
         
@@ -293,7 +261,7 @@ void    quit(std::vector<std::string> buffers, User& sender) {
 }
 
 
-void    nick(std::vector<std::string> buffers, User& sender, std::vector<User*> members) {
+void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*> members) {
     std::vector<struct s_replie>    replie;
 
     setReplie(&replie);
@@ -302,7 +270,7 @@ void    nick(std::vector<std::string> buffers, User& sender, std::vector<User*> 
         Server::sendReplie(tmp , 431, sender.GetUserFd(), replie);
         return ;
     }
-    if(find_member_name(members, buffers[2])) {
+    if(Server::findMemberName(members, buffers[2])) {
         std::vector<std::string>    tmp;
         tmp.push_back(buffers[2]);
         Server::sendReplie(tmp , 433, sender.GetUserFd(), replie);
