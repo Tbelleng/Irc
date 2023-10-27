@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/25 20:09:38 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/27 14:41:25 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ class Server
 	void ShowUserList(std::vector<User*> userList);
 	int AddingNewClient(int epoll_fd, struct epoll_event* events);
 	int ClientCheck(int user_fd);
-	void GetUserInfo(int user_fd, std::string& buffer);
+	int GetUserInfo(int user_fd, std::string& buffer);
 	User& whichUser(int user_fd);
     static void    sendReplie(std::vector<std::string> buffer, int replie, int socket_client, std::vector<struct s_replie> _replie);
     static User*   findMemberName(std::map<int, User*> userList, std::string member_name);

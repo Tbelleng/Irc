@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/25 15:22:25 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/27 15:16:23 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,13 @@ void	Server::handleClientRequest(int user_fd)
 	std::string message(buf, 512);
 	if (this->ClientCheck(user_fd) == 0)
 	{
-	    this->GetUserInfo(user_fd, message);
+	    if (!this->GetUserInfo(user_fd, message))
+	    {
+	            std::string error = "Wrong format for registration, you cant connect";
+	            send(user_fd, error.c_str(), error.size(), MSG_DONTWAIT);
+	            close(user_fd);
+	            return ;
+	    }
         std::cout << "New user Added ! His fd is : " << user_fd << std::endl;
         User& sender = this->whichUser(user_fd);
         std::string message = ":" + sender.GetUserName() + " 001 " + sender.getNickname() + " " + ":Welcome to our Server ! You are Live on Luciefer, Hel-Kame, Tbelleng Network " + "\r\n";
@@ -179,37 +185,55 @@ int Server::ClientCheck(int user_fd) {
     return 1;
 }
 
-void Server::GetUserInfo(int user_fd, std::string& buffer)
+int Server::GetUserInfo(int user_fd, std::string& buffer)
 {
     std::istringstream iss(buffer);
     std::string line;
     
-    std::string nickname;
     std::string password;
+    std::string nickname;
     std::string username;
 
     while (std::getline(iss, line)) {
-        if (line.find("PASS ") == 0) 
-        {
-            password = line.substr(5);
-        } 
-        else if (line.find("NICK ") == 0)
-        {
-            nickname = line.substr(5);
-        } 
-        else if (line.find("USER ") == 0)
-        {
-            size_t startPos = line.find("USER ") + 5;
-            size_t endPos = line.find(" ", startPos);
-            username = line.substr(startPos, endPos - startPos);
-            startPos = endPos + 1;
-            endPos = line.find(" ", startPos);
-            std::string hostname = line.substr(startPos, endPos - startPos);
+        std::istringstream lineStream(line);
+        std::string word;
+        std::string prevKeyword;
+
+        while (lineStream >> word) {
+            if (prevKeyword == "PASS") {
+                if (!word.empty() && word != "NICK" && word != "USER") {
+                    std::cout << "Word after PASS: " << word << std::endl;
+                    password = word;
+                } else {
+                    return 0;
+                }
+            } else if (prevKeyword == "NICK") {
+                if (!word.empty() && word != "PASS" && word != "USER") {
+                    std::cout << "Word after NICK: " << word << std::endl;
+                    nickname = word;
+                } else {
+                    return 0;
+                }
+            } else if (prevKeyword == "USER") {
+                if (!word.empty() && word != "PASS" && word != "NICK") {
+                    std::cout << "Word after USER: " << word << std::endl;
+                    username = word;
+                } else {
+                    return 0;
+                }
+            }
+
+            prevKeyword = word;
         }
     }
-    std::cout << "User info = " << password << " : " << nickname << " : " << username << std::endl;
+    
+    if (nickname.empty() || password.empty() || username.empty()) 
+    {
+        return 0;
+    }
     User* newUser = new User(nickname, password, username, user_fd);
     this->userList.insert(std::pair<int, User*>(user_fd, newUser));
+    return 1;
 }
 
 User& Server::whichUser(int user_fd) {return *this->userList[user_fd];}
