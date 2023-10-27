@@ -146,18 +146,22 @@ void    part(std::vector<std::string> buffers, User& sender, std::map<std::strin
         return ;
     }
     for (std::vector<std::string>::iterator it = buffers.begin() + 2; it != buffers.end(); it++) {
-        Channel* chan = Server::findChannel(*it, channelList);
-        if (chan == 0) {
-            std::vector<std::string>    tmp;
-            tmp.push_back(*it);
-            Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
+        std::string str = *it;
+        str.erase(0,1);
+        str = "#" + str;
+        Channel* chan = Server::findChannel(str, channelList);
+        if (!chan) {
+            std::string str_erro = ERR_NOSUCHCHANNEL(sender.getNickname(), str);
+            send(sender.GetUserFd(), str_erro.c_str(), str_erro.size(), 0);
+            continue ;
         }
         if(!chan->isInChannel(sender.GetUserFd())){
             std::vector<std::string>    tmp;
             tmp.push_back(*it);
             Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
-        }
-        chan->memberLeave(sender.GetUserFd());
+            continue ;
+        } else 
+            chan->memberLeave(sender.GetUserFd());
     }
     return ;
 }
