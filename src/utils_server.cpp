@@ -1,13 +1,5 @@
 #include "server.hpp"
 #include "Pars.cpp"
-// User&   getUser(int socket_client) {
-//     for(std::vector<User*>.iterator it = this->userList.begin(); it != this->userList.end(); it++) {
-//         if (it.getFd() == socket_client)
-//             return it;
-//     }
-//     return 0;
-// }
-//SendMessageTo(client, RPL_JOIN(client->GetNickname(), neededChannels[i_neededChannels]));
 
 void    setReplie(std::vector<struct s_replie>* replie) {
     struct s_replie a;
@@ -81,7 +73,7 @@ void    setReplie(std::vector<struct s_replie>* replie) {
     a.rplReplie = ":You're not channel operator\r\n";
 }
 
-bool    _parcing(std::string buffer, User& sender, std::vector<Channel*>& channelList, std::vector<User*>& userList)
+bool    _parcing(std::string buffer, User& sender, std::vector<Channel*>& channelList, std::map<int, User*>& userList)
 {
     
     std::vector<std::string>    buffers = ft_split(buffer, ' '); 

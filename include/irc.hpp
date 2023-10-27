@@ -5,24 +5,38 @@
 # define DEBUG_TOPIC 0
 # define DEBUG_MESS 0
 
-// # include <algorithm>
-# include <vector>
-# include <string>
-// // # include <map>
-# include <iostream>
-// // # include <fcntl.h>
-// // # include <cstring>
-// // # include <stdio.h>
-// # include <unistd.h>
-// # include <sys/types.h>
-// # include <sys/socket.h>
-// # include <sys/epoll.h>
-// # include <arpa/inet.h>
-// # include <vector>
+# define JOIN(nick, user, host, channel) (":" + nick + "!" + user + "@" + host + " JOIN :" + channel)
+# define RPL_TOPIC(nickname, channel_name) (std::string(":" " 332 " + nickname + " " + channel_name + " :<topic>" + "\r\n").c_str())
+# define RPL_NAMREPLY(nickname, chansymbol, channel_name, members) (std::string (":" " 353 " + nickname + " " + chansymbol + " " + channel_name + " :" + members + " \r\n"))
+# define RPL_ENDOFNAMES(nickname, channel_name) (std::string(":" " 366 " + nickname + " " + channel_name + " :End of /NAMES list" + "\r\n"))
+# define RPL_AWAY(chan_nickname, message) (std::string(":" " 301 " + chan_nickname + " :" + message + "\r\n"))
 
-// # include "User.hpp"
-// # include "Topic.hpp"
-// # include "Channel.hpp"
+# include <algorithm>
+# include <vector>
+# include <map>
+# include <iostream>
+# include <string>
+# include <fcntl.h>
+# include <cstring>
+# include <sstream>
+# include <stdio.h>
+# include <iomanip>
+# include <errno.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <sys/types.h>
+# include <poll.h>
+# include <sys/time.h>
+# include <arpa/inet.h>
+# include <netinet/in.h> 
+# include <vector>
+
+# include "Connection.hpp"
+# include "Topic.hpp"
+# include "User.hpp"
+# include "Channel.hpp"
+# include "Pars.hpp"
+# include "Message.hpp"
 # include "server.hpp"
 
 void    _send(const char* message, int member);
