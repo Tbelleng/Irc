@@ -56,7 +56,7 @@ bool sendMessage(int user_fd, const std::string& message)
     return true;
 }
 
-void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel*>& channelList)
+void    join(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
 {
     std::string channel = buffers[1];
     std::vector<struct s_replie>    replie;
@@ -90,7 +90,7 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
         send(sender.GetUserFd(), name_display.c_str(), name_display.size(), MSG_DONTWAIT);
         std::string end_name = RPL_ENDOFNAMES(sender.getNickname(), new_channel->getName());
         send(sender.GetUserFd(), end_name.c_str(), end_name.size(), MSG_DONTWAIT);
-        channelList.push_back(new_channel);
+        channelList.insert(std::pair<std::string, Channel*>(channel, new_channel));
         std::cout << "Channel added to the list" << std::endl;
     }
     
@@ -100,7 +100,7 @@ void    join(std::vector<std::string> buffers, User& sender, std::vector<Channel
 }
 //********************************************************************
 
-void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList,  std::map<int, User*> userList) {
+void    kick(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList,  std::map<int, User*> userList) {
     std::vector<struct s_replie>    replie;
 
     setReplie(&replie);
@@ -135,7 +135,7 @@ void    kick(std::vector<std::string> buffers, User& sender, std::vector<Channel
     return ;
 }
 
-void    part(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
+void    part(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList) {
     std::vector<struct s_replie>    replie;
 
     setReplie(&replie);
@@ -170,7 +170,7 @@ void    mode(std::vector<std::string> buffers, User& sender) {
     //std::cout << "You are in JOIN" << std::endl;
 }
 
-void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channel*> channelList) {
+void    topic(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList) {
     std::vector<struct s_replie>    replie;
 
     setReplie(&replie);
@@ -228,7 +228,7 @@ void    topic(std::vector<std::string> buffers, User& sender, std::vector<Channe
         Server::sendReplie(tmp , 332, sender.GetUserFd(), replie);
     }
 }
-void    privmsg(std::vector<std::string> buffers, User& sender, std::vector<Channel*>& channelList)
+void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
 {
     if (buffers.size() > 2)
     {
