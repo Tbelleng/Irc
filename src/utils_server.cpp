@@ -75,7 +75,6 @@ void    setReplie(std::vector<struct s_replie>* replie) {
 
 bool    _parcing(std::string buffer, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
 {
-    
     std::vector<std::string>    buffers = ft_split(buffer, ' '); 
     Command cmd = parseCommand(buffers[0]);
     

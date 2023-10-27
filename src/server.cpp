@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/27 15:16:23 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/10/27 17:01:37 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,18 +163,19 @@ void	Server::handleClientRequest(int user_fd)
         User& sender = this->whichUser(user_fd);
         std::string message = ":" + sender.GetUserName() + " 001 " + sender.getNickname() + " " + ":Welcome to our Server ! You are Live on Luciefer, Hel-Kame, Tbelleng Network " + "\r\n";
         send(user_fd, message.c_str(), message.size(), MSG_DONTWAIT);	
+        return ;
 	}
     if (nbytes > 0)
 	{
 		// Handle buffer as a vector of messages
 	    // std::string responsed = "001\r\n";
         // send(user_fd, responsed.c_str(), responsed.size(), 0);
-
 		// If _buff contains \r\n then proceed and empty buff
 		// Else do nothing
+		
 		User& sender = this->whichUser(user_fd);
 		_parcing(message, sender, this->channelList, this->userList);
-		// std::cout << "I got something, its " << message << std::endl;
+		//std::cout << "I got something, its " << message << std::endl;
 		
 	}
 }
