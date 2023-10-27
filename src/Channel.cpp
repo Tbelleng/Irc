@@ -24,10 +24,10 @@ Channel::Channel(std::string name, int _opMember) : _name(name), _topic() {
 
 bool Channel::isInChannel(int user)
 {
-    // std::string compare = sender.GetUserName();
-    for (std::vector<int>::iterator it = this->_members.begin(); it != this->_members.end(); ++it) 
-    {
-         if (*it == user) {
+    std::cout << "user: " << this->_members[0] << std::endl;
+    if(!this->_members.empty()) {
+        std::vector<int>::iterator it = find(this->_members.begin(), this->_members.end(), user);
+        if (it != this->_members.end()){
             return true;
         }
     }
