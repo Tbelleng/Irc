@@ -48,7 +48,7 @@ You should run this command in irssi:
 - [X] Develop channel management features.
 
 ### Client Implementation
-- [ ] Design and implement the IRC client user interface.
+- [X] Design and implement the IRC client user interface.
 - [ ] Implement client connection and socket handling.
 - [ ] Handle user input and send IRC commands.
 - [ ] Display messages and updates from the server.
