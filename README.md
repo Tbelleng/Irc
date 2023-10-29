@@ -49,7 +49,7 @@ You should run this command in irssi:
 
 ### Client Implementation
 - [X] Design and implement the IRC client user interface.
-- [ ] Implement client connection and socket handling.
+- [X] Implement client connection and socket handling.
 - [ ] Handle user input and send IRC commands.
 - [ ] Display messages and updates from the server.
 
