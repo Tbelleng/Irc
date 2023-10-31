@@ -51,7 +51,7 @@ You should run this command in irssi:
 - [X] Design and implement the IRC client user interface.
 - [X] Implement client connection and socket handling.
 - [X] Handle user input and send IRC commands.
-- [ ] Display messages and updates from the server.
+- [X] Display messages and updates from the server.
 
 ### Communication Protocol
 - [ ] Define and document the IRC communication protocol.
