@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/27 14:41:25 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/11/03 14:44:36 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,9 @@ class Server
 	
 	public :
 	
+	static std::string _name;
 	//new
+	
 	Server(int port, std::string password);
 	~Server(void);	
 	

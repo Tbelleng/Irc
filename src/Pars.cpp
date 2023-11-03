@@ -26,289 +26,69 @@ Command parseCommand(const std::string& cmd) {
     return UNKNOWN;
 }
 
-//***********************************JOIN FUNCTION*********************
-bool setNonBlocking(int socket_fd)
+//***********************************ALL FUNCTIONS*********************
+
+void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*>& members)
 {
-    if (fcntl(socket_fd, F_SETFL, O_NONBLOCK) == -1) {
-        perror("fcntl");
-        return false;
+    std::cout << "TAILLE = " << buffers.size() << std::endl;
+    if (buffers.size() < 2) {
+        sender.sendMsg(": 431 " + sender.getNickname() + " :No nickname given\r\n");
+        std::cout << "not enough arg" << std::endl;
+        return;
     }
-    return true;
-}
-
-bool sendMessage(int user_fd, const std::string& message)
-{
-    if (!setNonBlocking(user_fd)) {
-        return false;
+    
+    std::string new_nick = buffers[1];
+    std::cout << "on a  = " << buffers[0] << std::endl;
+    std::cout << "NICK =" << new_nick << std::endl;
+    if (new_nick.find_first_of("#$:") != std::string::npos || isdigit(new_nick[0]) != 0) 
+    {
+        sender.sendMsg(": 432 " + sender.getNickname() + " :Invalid nickname\r\n");
+        return;
     }
-
-    ssize_t bytes_sent = write(user_fd, message.c_str(), message.size());
-
-    if (bytes_sent == -1) {
-        if (errno == EAGAIN) {
-            std::cout << "Message send would block." << std::endl;
-            return false;
-        } else {
-            perror("write");
-            return false;
+    for (std::map<int, User*>::const_iterator it = members.begin(); it != members.end(); ++it)
+    {
+        if (it->second && it->second->getNickname() == new_nick && it->second->GetUserFd() != sender.GetUserFd())
+        {
+            new_nick = new_nick + "_";
         }
     }
-
-    return true;
+    sender.ChangeNickname(new_nick);
+    sender.sendMsg(":" + sender.getNickname() + " NICK " + new_nick + "\r\n");
+    std::cout << "New nickname = " << sender.getNickname() << std::endl;
+    
+    return ;
 }
 
-bool isFirstCharHash(const std::string& channel)
-{
-    if (!channel.empty() && channel[0] == '#') {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 void    join(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
 {
-    std::string channel = buffers[1];
-    std::vector<struct s_replie>    replie;
-
-    setReplie(&replie);
-    if (buffers.size() < 2) {
-        std::vector<std::string>    tmp;
-        tmp.push_back(buffers[0]);
-        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
-        return ;
-    }
-    
-    if (!isFirstCharHash(channel))
-    {
-        std::string error = ERR_BADCHANMASK(channel);
-        send(sender.GetUserFd(), error.c_str(), error.size(), MSG_DONTWAIT);
-        return ;
-    }
-    
-    Channel* channel_check = Server::findChannel(channel, channelList);
-    if (channel_check != NULL) //La channel existe deja
-    {
-        std::cout << "Channel already exist !\n" << std::endl;
-        channel_check->addMember(sender);
-        std::string topic_message = RPL_TOPIC(sender.getNickname(), channel_check->getName());
-        send(sender.GetUserFd(), topic_message.c_str(), topic_message.size(), MSG_DONTWAIT);
-        std::string name_display = RPL_NAMREPLY(sender.getNickname(), "=", channel_check->getName(), sender.getNickname());
-        send(sender.GetUserFd(), name_display.c_str(), name_display.size(), MSG_DONTWAIT);
-        std::string end_name = RPL_ENDOFNAMES(sender.getNickname(), channel_check->getName());
-        send(sender.GetUserFd(), end_name.c_str(), end_name.size(), MSG_DONTWAIT);
-    }
-    else
-    {
-        Channel* new_channel = new Channel(channel, sender.GetUserFd());
-        std::cout << "New Channel Joined : " << new_channel->getName() << std::endl;
-        std::string topic_message = RPL_TOPIC(sender.getNickname(), new_channel->getName());
-        send(sender.GetUserFd(), topic_message.c_str(), topic_message.size(), MSG_DONTWAIT);
-        std::string name_display = RPL_NAMREPLY(sender.getNickname(), "=", new_channel->getName(), sender.getNickname());
-        send(sender.GetUserFd(), name_display.c_str(), name_display.size(), MSG_DONTWAIT);
-        std::string end_name = RPL_ENDOFNAMES(sender.getNickname(), new_channel->getName());
-        send(sender.GetUserFd(), end_name.c_str(), end_name.size(), MSG_DONTWAIT);
-        channelList.insert(std::pair<std::string, Channel*>(channel, new_channel));
-        std::cout << "Channel added to the list" << std::endl;
-    }
-    
-    // utiliser Channel ici 1/ Veirifier si channel existe, si non creer une puis partir dans une fonction channel
-    
-    //attention si nouvelle channel ne pas oublier de la mettre dans channelList
-}
-//********************************************************************
-
-void    kick(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList,  std::map<int, User*> userList) {
-    std::vector<struct s_replie>    replie;
-
-    setReplie(&replie);
-    if (buffers.size() < 3) {
-        std::vector<std::string>    tmp;
-        tmp.push_back(buffers[1]);
-        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
-        return ;
-    }
-    Channel* chan = Server::findChannel(buffers[2], channelList);
-    if (chan == 0) {
-        std::vector<std::string>    tmp;
-        tmp.push_back(buffers[2]);
-        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
-        return ;
-    }
-    std::vector<int>    allOpMember = chan->getAllOpMember();
-    if(*find(allOpMember.begin(), allOpMember.end(), sender.GetUserFd()) != sender.GetUserFd()){
-        std::vector<std::string>    tmp;
-        tmp.push_back(buffers[2]);
-        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
-        return ;
-    }
-    User*    vic = Server::findMemberName(userList, buffers[3]);
-    if(!chan->isInChannel(vic->GetUserFd())) {
-        std::vector<std::string>    tmp;
-        tmp.push_back(buffers[2]);
-        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
-        return ;
-    }
-    chan->suppMember(sender.GetUserFd(), vic->GetUserFd());
-    return ;
-}
-
-void    part(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList) {
-    std::vector<struct s_replie>    replie;
-
-    setReplie(&replie);
-    if (buffers.size() < 2) {
-        std::vector<std::string>    tmp;
-        tmp.push_back(buffers[0]);
-        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
-        return ;
-    }
-    for (std::vector<std::string>::iterator it = buffers.begin() + 2; it != buffers.end(); it++) {
-        std::string str = *it;
-        str.erase(0,1);
-        str = "#" + str;
-        Channel* chan = Server::findChannel(str, channelList);
-        if (!chan) {
-            std::string str_erro = ERR_NOSUCHCHANNEL(sender.getNickname(), str);
-            send(sender.GetUserFd(), str_erro.c_str(), str_erro.size(), 0);
-            continue ;
+        if (buffers.size() < 2) 
+        {
+            sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
+            return ;
         }
-        if(!chan->isInChannel(sender.GetUserFd())){
-            std::vector<std::string>    tmp;
-            tmp.push_back(*it);
-            Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
-            continue ;
-        } else 
-            chan->memberLeave(sender.GetUserFd());
-    }
-    return ;
-}
-
-void    mode(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_CHANOPRIVSNEEDED(482)<channel> ERR_NOSUCHNICK(401)<nickname> ERR_UNKNOWMODE(472)<char> ERR_NOSUCHCHANNEL(403)<channel name> ERR_USERDONTMATCH(502)
-    // replie : RPL_UNMODEIS(221)<user mode string>
-    //std::cout << "You are in JOIN" << std::endl;
-}
-
-void    topic(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList) {
-    std::vector<struct s_replie>    replie;
-
-    setReplie(&replie);
-    if (buffers.size() < 2) {
-        std::vector<std::string>    tmp;
-        tmp.push_back(buffers[1]);
-        Server::sendReplie(tmp , 461, sender.GetUserFd(), replie);
-        return ;
-    }
-    Channel* chan = Server::findChannel(buffers[2], channelList);
-    if (chan == 0) {
-        std::vector<std::string>    tmp;
-        tmp.push_back(buffers[2]);
-        Server::sendReplie(tmp , 403, sender.GetUserFd(), replie);
-        return ;
-    }
-    if(!chan->isInChannel(sender.GetUserFd())){
-        std::vector<std::string>    tmp;
-        tmp.push_back(chan->getName());
-        Server::sendReplie(tmp , 442, sender.GetUserFd(), replie);
-        return ;
-    }
-    std::string topic = chan->getTopic();
-    if (topic == "")
-    {
-        if(buffers.size() >= 3) {
-                std::string topic = 0;
-            for(std::vector<std::string>::iterator it = buffers.begin() + 3; it != buffers.end(); it++)
-               topic += *it; 
-            if (!chan->setTopic(sender.GetUserFd(), topic)) {
-                    std::vector<std::string>    tmp;
-                    tmp.push_back(chan->getName());
-                    Server::sendReplie(tmp , 482, sender.GetUserFd(), replie);
-                    return ;
-            }
+        std::string channel_name = buffers[1];
+        if (buffers.size() > 3 || channel_name[0] != '#')
+        {
+            sender.sendMsg(":" + channel_name + " 476 :Bad Channel Mask\r\n");
+            return ;
         }
-        std::vector<std::string>    tmp;
-        tmp.push_back(chan->getName());
-        Server::sendReplie(tmp , 331, sender.GetUserFd(), replie);
-    } else {
-        if(buffers.size() >= 3) {
-                std::string topic = 0;
-            for(std::vector<std::string>::iterator it = buffers.begin() + 3; it != buffers.end(); it++)
-               topic += *it; 
-            if (!chan->setTopic(sender.GetUserFd(), topic)) {
-                    std::vector<std::string>    tmp;
-                    tmp.push_back(chan->getName());
-                    Server::sendReplie(tmp , 482, sender.GetUserFd(), replie);
-                    return ;
-            }
-        }
-        std::vector<std::string>    tmp;
-        tmp.push_back(chan->getName());
-        tmp.push_back(topic);
-        Server::sendReplie(tmp , 332, sender.GetUserFd(), replie);
-    }
+        std::string _pass = NULL;
+        if (buffers.size() == 3)
+            _pass = buffers[2];
+        isItNewChannel(channel_name, sender, channelList, _pass);
 }
-void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
+
+void    isItNewChannel(std::string channel_name, User& sender, std::map<std::string, Channel*>& channelList, std::string channel_pass)
 {
-    if (buffers.size() > 2)
+    for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
     {
-        std::string channel = buffers[1];
-        Channel* channel_check = Server::findChannel(channel, channelList);
-        std::string msg = RPL_AWAY(channel_check->getName(), buffers[2]);
-        channel_check->spreadMsg(sender, channel, buffers);
-        
-        //std::string end_name = RPL_ENDOFNAMES(sender.getNickname(), new_channel->getName());
-        //send(sender.GetUserFd(), name_display.c_str(), name_display.size(), MSG_DONTWAIT);
+        if (it->first && it->first == channel_name)
+        {
+            
+        }
     }
-    else
-        return ;
+
+
+
 }
-
-void    user(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    //std::string argument = "PRIVMSG : Welcome to our IRC Server !";
-    //"332 " + channelName + " :This is the channel topic";
-    // argument += "332\r\n"; 
-    //sendMessage(sender.GetUserFd(), argument);
-    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_ALREADYREGISTRED(462)
-}
-
-void    quit(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-    std::cout << "You used QUIT" << std::endl;
-}
-
-
-void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*> members) {
-    std::vector<struct s_replie>    replie;
-
-    setReplie(&replie);
-    if (buffers.size() < 2) {
-        std::vector<std::string>    tmp;
-        Server::sendReplie(tmp , 431, sender.GetUserFd(), replie);
-        return ;
-    }
-    if(Server::findMemberName(members, buffers[2])) {
-        std::vector<std::string>    tmp;
-        tmp.push_back(buffers[2]);
-        Server::sendReplie(tmp , 433, sender.GetUserFd(), replie);
-        return ;
-    }
-    sender.ChangeNickname(buffers[2]);
-    return ;
-}
-
-void    pass(std::vector<std::string> buffers, User& sender) {
-    (void) buffers, (void) sender;
-    // return error : ERR_NEEDMOREPARAMS(461)<cmd> ERR_ALREADYREGISTRED(462)
-}
-
-void    sendNoCmd(std::vector<std::string> buffers, User& sender) {
-    (void)buffers;
-    (void)sender;
-}
-

@@ -1,25 +1,29 @@
 #include "irc.hpp"
 
-std::vector<std::string>    ft_split(std::string s1, const char token) {
-    std::vector<std::string>    buffer;
-    std::string                 tmp;
-    
-    for (uint i = 0; i < s1.size(); i++) {
-        if (s1[i] != token)
-            tmp += s1[i];
-        else if (!tmp.empty()){
-            buffer.push_back(tmp);
-            tmp.clear();
+std::vector<std::string> ft_split(const std::string& inputString)
+{
+    std::vector<std::string> result;
+    std::string currentWord;
+
+    for (size_t i = 0; i < inputString.length(); ++i) {
+        char c = inputString[i];
+
+        if (c == ' ' || c == '\t') {
+            if (!currentWord.empty()) {
+                result.push_back(currentWord);
+                currentWord.clear();
+            }
+        } else {
+            currentWord += c;
         }
     }
 
-    if (!tmp.empty()) {
-        buffer.push_back(tmp);
+    if (!currentWord.empty()) {
+        result.push_back(currentWord);
     }
-    
-    return buffer;
-}
 
+    return result;
+}
 // void    _send(const char* message, int member, int epfd, struct epoll_event& ev) {
 //     ev.events = EPOLLOUT;
 //     ev.data.fd = member;

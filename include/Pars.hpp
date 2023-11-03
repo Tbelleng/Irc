@@ -30,7 +30,7 @@ void    pass(std::vector<std::string> buffers, User& sender);
 void    topic(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList);
 void    user(std::vector<std::string> buffers, User& sender);
 void    quit(std::vector<std::string> buffers, User& sender);
-void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*> members);
+void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*>& members);
 void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList);
 void    notice(std::vector<std::string> buffers, User& sender);
 void    sendNoCmd(std::vector<std::string> buffers, User& sender);

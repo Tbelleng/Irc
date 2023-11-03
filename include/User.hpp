@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/12 16:40:25 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/24 16:18:44 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/11/03 14:18:38 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ class User
 	{
 		return (this->username);
 	}
+	
+	void sendMsg(std::string msg) const;
 	
 	
 	std::string RPL_WELCOME() { return (":" + this->hostname + " 001 " + this->nickname + " " + ":Welcome to the our Server, " + "\r\n"); };

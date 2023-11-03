@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/10/27 17:01:37 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/11/03 15:08:32 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,20 +104,15 @@ void Server::acceptNewClient()
     // Set the new socket for the User
     new_user.setSocket(new_socket);
 
-    // Print information about the new client
     std::cout << "New Client " << inet_ntoa(new_user._sockaddr.sin_addr) << ":"
               << ntohs(new_user._sockaddr.sin_port) << " (" << new_user.getSocket() << ")"
               << std::endl;
 
-    // Add the new client's socket to the list of file descriptors to poll
     struct pollfd new_pollfd;
     new_pollfd.fd = new_user.getSocket();
     new_pollfd.events = POLLIN;
     new_pollfd.revents = 0;
     this->_pollfds.push_back(new_pollfd);
-
-    // Add the new User to the map of connected clients
-    // this->getConnection()[new_pollfd.fd] = new_user;
 }
 
 int     Server::getSocket(void) 
@@ -139,16 +134,14 @@ void	Server::handleClientRequest(int user_fd)
 	std::cout << "BUFF = " << testing << std::endl;
 	if (nbytes <= 0)
 	{
-		// Got error or connection closed by client
 		if (nbytes == 0)
 			std::cout << "pollserver: socket " << user_fd << " hung up" << std::endl;
 		else
 			perror("recv");
 		int sfd = user_fd;
 		close(sfd);
-		//effacer le client ici
 	}
-	//build a User here
+
 	std::string message(buf, 512);
 	if (this->ClientCheck(user_fd) == 0)
 	{
@@ -161,23 +154,16 @@ void	Server::handleClientRequest(int user_fd)
 	    }
         std::cout << "New user Added ! His fd is : " << user_fd << std::endl;
         User& sender = this->whichUser(user_fd);
-        std::string message = ":" + sender.GetUserName() + " 001 " + sender.getNickname() + " " + ":Welcome to our Server ! You are Live on Luciefer, Hel-Kame, Tbelleng Network " + "\r\n";
+        std::string message = "001 " + sender.GetUserName() + sender.getNickname() + " " + ":Welcome to our Server ! You are Live on Luciefer, Hel-Kame, Tbelleng Network " + "\r\n";
         send(user_fd, message.c_str(), message.size(), MSG_DONTWAIT);	
         return ;
 	}
     if (nbytes > 0)
 	{
-		// Handle buffer as a vector of messages
-	    // std::string responsed = "001\r\n";
-        // send(user_fd, responsed.c_str(), responsed.size(), 0);
-		// If _buff contains \r\n then proceed and empty buff
-		// Else do nothing
-		
 		User& sender = this->whichUser(user_fd);
 		_parcing(message, sender, this->channelList, this->userList);
-		//std::cout << "I got something, its " << message << std::endl;
-		
 	}
+	message.clear();
 }
 
 int Server::ClientCheck(int user_fd) {
@@ -232,6 +218,9 @@ int Server::GetUserInfo(int user_fd, std::string& buffer)
     {
         return 0;
     }
+    nickname.erase(std::remove(nickname.begin(), nickname.end(), ' '), nickname.end());
+    password.erase(std::remove(password.begin(), password.end(), ' '), password.end());
+    username.erase(std::remove(username.begin(), username.end(), ' '), username.end());
     User* newUser = new User(nickname, password, username, user_fd);
     this->userList.insert(std::pair<int, User*>(user_fd, newUser));
     return 1;

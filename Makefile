@@ -6,8 +6,7 @@ SRCS = $(SRC_DIR)main.cpp	\
 	   $(SRC_DIR)Channel.cpp	\
 	   $(SRC_DIR)server.cpp	\
 	   $(SRC_DIR)User.cpp	\
-	   $(SRC_DIR)utils.cpp		\
-	   $(SRC_DIR)Topic.cpp	
+	   $(SRC_DIR)utils.cpp		
 
 OBJS_DIR = ./obj/
 
