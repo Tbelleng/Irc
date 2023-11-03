@@ -28,6 +28,7 @@ Command parseCommand(const std::string& cmd) {
 
 //***********************************ALL FUNCTIONS*********************
 
+                // NICK FUNCTION //
 void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*>& members)
 {
     std::cout << "TAILLE = " << buffers.size() << std::endl;
@@ -56,9 +57,62 @@ void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*
     sender.sendMsg(":" + sender.getNickname() + " NICK " + new_nick + "\r\n");
     std::cout << "New nickname = " << sender.getNickname() << std::endl;
     
+    //refresh le nickname sur les channels
+    
     return ;
 }
 
+                // JOIN FUNCTION //
+void    channelExist(Channel& current_channel, User& sender, std::map<std::string, Channel*>& channelList, std::string channel_pass)
+{
+    //Rajouter ici une fonction si la Channel est en invite Only (regarder si le User a ete add aux operators)
+    if(current_channel.needPass() == true && current_channel.getPassword() != channel_pass)
+    {
+        sender.sendMsg("475 " + sender.getNickname() + " " + current_channel.getName() + " :Cannot join channel (+k)\r\n");
+        return ;
+    }
+    if(current_channel.getCurrentUsers() == current_channel.getMaxUsers())
+    {
+        sender.sendMsg("471 " + sender.getNickname() + " " + current_channel.getName() + " :Cannot join Channel\r\n");
+        return ;
+    }
+    current_channel.addMember(sender);
+    sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " JOIN " + current_channel.getName() + "\r\n");
+    
+    //suite des messages 
+    
+    
+    (void)channelList;
+}
+
+void newChannel(std::string channel_name, User& sender, std::map<std::string, Channel*>& channelList, std::string channel_pass)
+{
+    Channel* new_channel = new Channel(channel_name, sender.getNickname(), channel_pass);
+    std::cout << "New Channel joined" << std::endl;
+    channelList.insert(std::make_pair(channel_name, new_channel));
+    sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " JOIN " + channel_name + "\r\n");
+    if (new_channel->getTopic() != "")
+        sender.sendMsg("332 " + sender.getNickname() + " " + channel_name + " :" + new_channel->getTopic() + "\r\n");
+    
+    sender.sendMsg(": 353 " + sender.getNickname() + " = " + channel_name + " :" + "@" + sender.getNickname() + "\r\n");
+    sender.sendMsg(": 366 " + sender.getNickname() + " " + channel_name + " :End of /NAMES list.\r\n");
+    
+    return ;
+}
+
+void    isItNewChannel(std::string channel_name, User& sender, std::map<std::string, Channel*>& channelList, std::string channel_pass)
+{
+    for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
+    {
+        if (!it->first.empty() && it->first == channel_name)
+        {
+            channelExist(*it->second, sender, channelList, channel_pass);
+            return ;
+        }
+    }
+    newChannel(channel_name, sender, channelList, channel_pass);
+    return ;
+}
 
 void    join(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
 {
@@ -73,22 +127,9 @@ void    join(std::vector<std::string> buffers, User& sender, std::map<std::strin
             sender.sendMsg(":" + channel_name + " 476 :Bad Channel Mask\r\n");
             return ;
         }
-        std::string _pass = NULL;
+        std::cout << "DEBUG" << std::endl;
+        std::string _pass = "";
         if (buffers.size() == 3)
             _pass = buffers[2];
         isItNewChannel(channel_name, sender, channelList, _pass);
-}
-
-void    isItNewChannel(std::string channel_name, User& sender, std::map<std::string, Channel*>& channelList, std::string channel_pass)
-{
-    for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
-    {
-        if (it->first && it->first == channel_name)
-        {
-            
-        }
-    }
-
-
-
 }
