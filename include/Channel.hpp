@@ -40,6 +40,7 @@ class Channel
 	void                       increaseCurrentUser(void);
 	std::string                getUserList(void);
 	void                       joinBroadcast(User& sender);
+	void                       broadcasting(std::string msg, int sender_fd);
 	
 	
 	

@@ -132,7 +132,7 @@ void    join(std::vector<std::string> buffers, User& sender, std::map<std::strin
             sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
             return ;
         }
-        std::string channel_name = buffers[1];
+        std::string channel_name = removeSpecificSpaces(buffers[1]);
         if (buffers.size() > 3 || channel_name[0] != '#')
         {
             sender.sendMsg(":" + channel_name + " 476 :Bad Channel Mask\r\n");
@@ -143,4 +143,46 @@ void    join(std::vector<std::string> buffers, User& sender, std::map<std::strin
         if (buffers.size() == 3)
             _pass = buffers[2];
         isItNewChannel(channel_name, sender, channelList, _pass);
+}
+
+                    //PRIVMSG 
+void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
+{
+    if (buffers.size() == 1) {
+        sender.sendMsg("461 " + buffers[0] + " :Not Enough Parameters\r\n");
+        return;
+    }
+    if (buffers.size() == 2) {
+        sender.sendMsg(": 412 :No text to send\r\n");
+        return;
+    }
+    if (buffers[2][0] != ':') {
+        sender.sendMsg("ERROR :Invalid message format\r\n");
+        return;
+    }
+    
+    std::string clean_msg = trimBuffers(buffers);
+    if (buffers[1][0] == '#') //Si la cible est une channel
+    {
+        std::map<std::string, Channel*>::iterator it;
+        for (it = channelList.begin(); it != channelList.end(); ++it)
+        {
+            std::cout << "OK DONC le nom de la cible = " << buffers[1] << " ET LE NOM COMAPRER = " << it->first << std::endl;
+            printAsciiCharacters(buffers[1]);
+            std::cout << "et apres on a " << std::endl;
+            printAsciiCharacters(it->first);
+            if (it->first == buffers[1])
+            {
+                it->second->broadcasting((":" + sender.getNickname() + " PRIVMSG " + buffers[1] + " :" + clean_msg + "\r\n"), sender.GetUserFd());
+                return ;
+            }
+        }
+        sender.sendMsg(": 403 " + buffers[1] + ": No such CHANNEL\r\n");
+    }
+    //faire pour si la cible est un user;
+    
+    
+    return ;
+
+
 }

@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/11/03 15:08:32 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/11/04 17:35:01 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,7 @@ void	Server::handleClientRequest(int user_fd)
 	std::string message(buf, 512);
 	if (this->ClientCheck(user_fd) == 0)
 	{
+	    fcntl(user_fd, F_SETFL, O_NONBLOCK);
 	    if (!this->GetUserInfo(user_fd, message))
 	    {
 	            std::string error = "Wrong format for registration, you cant connect";
@@ -192,6 +193,7 @@ int Server::GetUserInfo(int user_fd, std::string& buffer)
                     std::cout << "Word after PASS: " << word << std::endl;
                     password = word;
                 } else {
+                    std::cout << "FAIL AT PASS" << std::endl;
                     return 0;
                 }
             } else if (prevKeyword == "NICK") {
@@ -199,6 +201,7 @@ int Server::GetUserInfo(int user_fd, std::string& buffer)
                     std::cout << "Word after NICK: " << word << std::endl;
                     nickname = word;
                 } else {
+                    std::cout << "FAIL AT NICK" << std::endl;
                     return 0;
                 }
             } else if (prevKeyword == "USER") {
@@ -206,6 +209,7 @@ int Server::GetUserInfo(int user_fd, std::string& buffer)
                     std::cout << "Word after USER: " << word << std::endl;
                     username = word;
                 } else {
+                    std::cout << "FAIL AT USER" << std::endl;
                     return 0;
                 }
             }
@@ -213,6 +217,9 @@ int Server::GetUserInfo(int user_fd, std::string& buffer)
             prevKeyword = word;
         }
     }
+    
+    if (username.empty())
+        username = "stud42";
     
     if (nickname.empty() || password.empty() || username.empty()) 
     {

@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/11/03 14:44:36 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/11/04 19:08:29 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,5 +68,7 @@ class Server
 
 void    setReplie(std::vector<struct s_replie>* replie);
 bool    _parcing(std::string buffer, User* sender, std::map<std::string, Channel*> channelList, std::vector<User*> userList);
-
+std::string trimBuffers(const std::vector<std::string>& buffer);
+std::string removeSpecificSpaces(const std::string& input);
+void printAsciiCharacters(const std::string& str);
 #endif
