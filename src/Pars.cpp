@@ -146,7 +146,7 @@ void    join(std::vector<std::string> buffers, User& sender, std::map<std::strin
 }
 
                     //PRIVMSG 
-void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
+void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
 {
     if (buffers.size() == 1) {
         sender.sendMsg("461 " + buffers[0] + " :Not Enough Parameters\r\n");
@@ -167,10 +167,6 @@ void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::st
         std::map<std::string, Channel*>::iterator it;
         for (it = channelList.begin(); it != channelList.end(); ++it)
         {
-            std::cout << "OK DONC le nom de la cible = " << buffers[1] << " ET LE NOM COMAPRER = " << it->first << std::endl;
-            printAsciiCharacters(buffers[1]);
-            std::cout << "et apres on a " << std::endl;
-            printAsciiCharacters(it->first);
             if (it->first == buffers[1])
             {
                 it->second->broadcasting((":" + sender.getNickname() + " PRIVMSG " + buffers[1] + " :" + clean_msg + "\r\n"), sender.GetUserFd());
@@ -179,9 +175,20 @@ void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::st
         }
         sender.sendMsg(": 403 " + buffers[1] + ": No such CHANNEL\r\n");
     }
-    //faire pour si la cible est un user;
-    
-    
+    else
+    {
+        std::map<int, User*>::iterator it;
+        for (it = userList.begin(); it != userList.end(); it++)
+        {
+            if (it->second->getNickname() == buffers[1])
+            {
+                it->second->sendMsg(":" + sender.getNickname() + " PRIVMSG " + it->second->getNickname() + " : " + clean_msg + "\r\n");
+                return;
+            }
+            sender.sendMsg(": 401 " + sender.getNickname() + ": No such NICK\r\n");
+            return;
+        }
+    }
     return ;
 
 
