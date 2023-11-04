@@ -1,6 +1,6 @@
 #include "server.hpp"
 
-Channel::Channel(std::string name, std::string username, std::string pass)
+Channel::Channel(std::string name, std::string username, std::string pass, User& client)
 {
     this->_name = name;
     this->_topic = "";
@@ -16,6 +16,7 @@ Channel::Channel(std::string name, std::string username, std::string pass)
     }
     this->_opMembers.push_back(username);
     this->_members.push_back(username);
+    this->_usersFd.push_back(client.GetUserFd());
     this->_onlyInvite = false;
     this->_currentUsers++;
     this->_maxUsers = 10;
@@ -57,6 +58,7 @@ unsigned int    Channel::getCurrentUsers(void)
 void    Channel::addMember(User& client)
 {
     this->_members.push_back(client.getNickname());
+    this->_usersFd.push_back(client.GetUserFd());
     this->increaseCurrentUser();
     return ;
 }
@@ -64,6 +66,31 @@ void    Channel::addMember(User& client)
 void    Channel::increaseCurrentUser(void)
 {
     this->_currentUsers++;
+    return ;
+}
+
+std::string    Channel::getUserList(void)
+{
+    std::string result;
+    std::vector<std::string>::iterator it;
+    for (it = this->_members.begin(); it != this->_members.end(); ++it)
+    {
+        result = result + "@" + (*it) + " ";
+    }
+    std::cout << "La USER LIST =" << result << std::endl;
+    return (result);
+}
+
+void    Channel::joinBroadcast(User& sender)
+{
+    std::string msg = ":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " JOIN " + this->getName() + "\r\n";
+    std::vector<int>::iterator it;
+    for (it = this->_usersFd.begin(); it != this->_usersFd.end(); ++it)
+    {
+        if ((*it) != sender.GetUserFd())
+            send((*it), msg.c_str(), msg.length(), 0);
+    }
+    std::cout << "broadcasting to channel users" << std::endl;
     return ;
 }
 

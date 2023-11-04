@@ -66,6 +66,7 @@ void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*
 void    channelExist(Channel& current_channel, User& sender, std::map<std::string, Channel*>& channelList, std::string channel_pass)
 {
     //Rajouter ici une fonction si la Channel est en invite Only (regarder si le User a ete add aux operators)
+    std::cout << "LA CHANNEL EXISTE" << std::endl;
     if(current_channel.needPass() == true && current_channel.getPassword() != channel_pass)
     {
         sender.sendMsg("475 " + sender.getNickname() + " " + current_channel.getName() + " :Cannot join channel (+k)\r\n");
@@ -77,17 +78,27 @@ void    channelExist(Channel& current_channel, User& sender, std::map<std::strin
         return ;
     }
     current_channel.addMember(sender);
-    sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " JOIN " + current_channel.getName() + "\r\n");
     
-    //suite des messages 
+    sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " JOIN " + current_channel.getName() + "\r\n");
+    current_channel.joinBroadcast(sender);
+    
+    if (current_channel.getTopic() != "")
+        sender.sendMsg("332 " + sender.getNickname() + " " + current_channel.getName() + " :" + current_channel.getTopic() + "\r\n");
+    
+    std::string user_list = current_channel.getUserList();
+    
+    sender.sendMsg(": 353 " + sender.getNickname() + " = " + current_channel.getName() + " :" + user_list + "\r\n");
+    sender.sendMsg(": 366 " + sender.getNickname() + " " + current_channel.getName() + " :End of /NAMES list.\r\n");
     
     
     (void)channelList;
+    return ;
 }
 
 void newChannel(std::string channel_name, User& sender, std::map<std::string, Channel*>& channelList, std::string channel_pass)
 {
-    Channel* new_channel = new Channel(channel_name, sender.getNickname(), channel_pass);
+    std::cout << "NOUVELLE CHANNEL" << std::endl;
+    Channel* new_channel = new Channel(channel_name, sender.getNickname(), channel_pass, sender);
     std::cout << "New Channel joined" << std::endl;
     channelList.insert(std::make_pair(channel_name, new_channel));
     sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " JOIN " + channel_name + "\r\n");

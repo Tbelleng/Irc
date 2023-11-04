@@ -7,6 +7,7 @@ class Channel
   
 	std::vector<std::string> _members;
 	std::vector<std::string> _opMembers;
+	std::vector<int> _usersFd;
 	std::string _name;
 	std::string _topic;
 	std::string _password;
@@ -17,7 +18,7 @@ class Channel
 
   public:
 
-    Channel(std::string name, std::string username, std::string pass);
+    Channel(std::string name, std::string username, std::string pass, User& client);
 	~Channel(void);
 
 	void                setMember(int newMember);
@@ -37,6 +38,8 @@ class Channel
 	unsigned int               getCurrentUsers(void);
 	void                       addMember(User& client);
 	void                       increaseCurrentUser(void);
+	std::string                getUserList(void);
+	void                       joinBroadcast(User& sender);
 	
 	
 	
