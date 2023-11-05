@@ -54,7 +54,7 @@ You should run this command in irssi:
 - [X] Display messages and updates from the server.
 
 ### Communication Protocol
-- [ ] Define and document the IRC communication protocol.
+- [X] Define and document the IRC communication protocol.
 - [ ] Ensure proper encoding and decoding of IRC messages.
 
 ### Testing and Quality Assurance
