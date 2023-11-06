@@ -42,7 +42,8 @@ class Channel
 	void                       joinBroadcast(User& sender);
 	void                       broadcasting(std::string msg, int sender_fd);
 	
-	
+	bool                       userOfChannel(User& sender);
+	void                       removeUser(User& sender);
 	
     void                suppMember(int opMember, int suppMember);
     void                suppOpMember(int opMember, int suppOpMember);

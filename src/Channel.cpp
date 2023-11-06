@@ -105,6 +105,54 @@ void    Channel::broadcasting(std::string msg, int sender_fd)
     return ;
 }
 
+bool    Channel::userOfChannel(User& sender)
+{
+    std::string _userName = sender.getNickname();
+    std::vector<std::string>::iterator it;
+    for (it = this->_members.begin(); it != this->_members.end(); it++)
+    {
+        if ((*it) == _userName)
+            return true;
+    }
+    return false;
+}
+
+void    Channel::removeUser(User& sender)
+{
+    std::string _userName = sender.getNickname();
+    int _userfd = sender.GetUserFd();
+    std::vector<std::string>::iterator it;
+    for (it = this->_members.begin(); it != this->_members.end(); it++)
+    {
+        if ((*it) == _userName)
+        {
+            this->_members.erase(it);
+            break;
+        }
+    }
+    std::vector<std::string>::iterator itt;
+    for (itt = this->_opMembers.begin(); itt != this->_opMembers.end(); itt++)
+    {
+        if ((*itt) == _userName)
+        {
+            this->_opMembers.erase(itt);
+            break;
+        }
+    }
+    std::vector<int>::iterator ittt;
+    for (ittt = this->_usersFd.begin(); ittt != this->_usersFd.end(); ittt++)
+    {
+        if ((*ittt) == _userfd)
+        {
+            this->_usersFd.erase(ittt);
+            break;
+        }
+    }
+    std::cout << "User erased" << std::endl;
+    return ;
+}
+
+
 std::string vectorToString(const std::vector<std::string>& buffer) 
 {
     std::string result;

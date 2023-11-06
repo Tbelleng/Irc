@@ -160,7 +160,6 @@ void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::st
         sender.sendMsg("ERROR :Invalid message format\r\n");
         return;
     }
-    
     std::string clean_msg = trimBuffers(buffers);
     if (buffers[1][0] == '#') //Si la cible est une channel
     {
@@ -178,18 +177,53 @@ void    privmsg(std::vector<std::string> buffers, User& sender, std::map<std::st
     else
     {
         std::map<int, User*>::iterator it;
-        for (it = userList.begin(); it != userList.end(); it++)
+        for (it = userList.begin(); it != userList.end(); ++it)
         {
+            //std::cout << "Nickname de l'iterateur " << std::endl;
+            //printAsciiCharacters(it->second->getNickname());
+            //std::cout << std::endl << "Le nickname du buffeur " << std::endl;
+            //printAsciiCharacters(buffers[1]);
             if (it->second->getNickname() == buffers[1])
             {
+                //std::cout << "J'ai trouver l'utilisateur" << std::endl;
                 it->second->sendMsg(":" + sender.getNickname() + " PRIVMSG " + it->second->getNickname() + " : " + clean_msg + "\r\n");
                 return;
             }
-            sender.sendMsg(": 401 " + sender.getNickname() + ": No such NICK\r\n");
-            return;
         }
+        sender.sendMsg(": 401 " + sender.getNickname() + ": No such NICK\r\n");
+        return;
     }
     return ;
+}
 
-
+                // PART FUNCTION //
+void    part(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
+{
+    if (buffers.size() != 2) {
+        sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
+        return;
+    }
+    if (buffers[1][0] != '#') {
+        sender.sendMsg(": 403 " + sender.getNickname() + " " + buffers[1] + " :No such channel\r\n");
+        return;
+    }
+    std::string channel_name = removeSpecificSpaces(buffers[1]);
+    std::cout << "Le nom de la channel = " << channel_name << std::endl;
+    printAsciiCharacters(channel_name);
+    
+    for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
+    {
+        if (!it->first.empty() && it->first == channel_name)
+        {
+            if (it->second->userOfChannel(sender))
+            {
+                it->second->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " PART " + channel_name + "\r\n"), sender.GetUserFd());
+                sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " PART " + channel_name + "\r\n");
+                it->second->removeUser(sender);
+                return ;
+            }
+        }
+    }
+    sender.sendMsg("442 " + sender.getNickname() + " :You're not on that channel\r\n");
+    return ;
 }

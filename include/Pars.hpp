@@ -22,12 +22,12 @@ enum Command {
 Command parseCommand(const std::string& cmd);
 
 void    join(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList);
-void    kick(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList, std::map<int, User*> userList);
+void    kick(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList);
 void    invite(std::vector<std::string> buffers, User& sender);
-void    part(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList);
+void    part(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList);
 void    mode(std::vector<std::string> buffers, User& sender);
 void    pass(std::vector<std::string> buffers, User& sender);
-void    topic(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*> channelList);
+void    topic(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList);
 void    user(std::vector<std::string> buffers, User& sender);
 void    quit(std::vector<std::string> buffers, User& sender);
 void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*>& members);
