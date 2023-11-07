@@ -24,7 +24,8 @@ class Channel
 	void                setMember(int newMember);
     void                setOpMember(int oldOpMember, int newOpMember);
     void                setGrade(int Member, int grade);
-    bool                setTopic(int Member, std::string topic);
+    
+    void                setTopic(std::string new_topic);
 
 	std::string getName(void) const
 	{
@@ -42,6 +43,7 @@ class Channel
 	void                       joinBroadcast(User& sender);
 	void                       broadcasting(std::string msg, int sender_fd);
 	
+	bool                       opOfChannel(User& sender);
 	bool                       userOfChannel(User& sender);
 	void                       removeUser(User& sender);
 	

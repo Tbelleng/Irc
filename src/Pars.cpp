@@ -227,3 +227,27 @@ void    part(std::vector<std::string> buffers, User& sender, std::map<std::strin
     sender.sendMsg("442 " + sender.getNickname() + " :You're not on that channel\r\n");
     return ;
 }
+
+            //TOPIC FUNCTION 
+void    topic(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
+{
+    if (buffers.size() < 3 || buffers[1].empty() || buffers[1][0] != '#' || buffers[2].empty() || buffers[2][0] != ':') 
+    {
+        sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
+        return;
+    }
+    std::string channel_name = removeSpecificSpaces(buffers[1]);
+    std::string new_topic = buffers[2].substr(1);
+    for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
+    {
+        if (!it->first.empty() && it->first == channel_name)
+        {
+            if (it->second->opOfChannel(sender))
+            {
+                it->second->setTopic(new_topic);
+                sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " TOPIC " + it->second->getName() + " :" + it->second->getTopic() + "\r\n");
+                return ;
+            }
+        }
+    }
+}

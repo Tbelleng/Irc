@@ -105,6 +105,19 @@ void    Channel::broadcasting(std::string msg, int sender_fd)
     return ;
 }
 
+bool    Channel::opOfChannel(User& sender)
+{
+    std::string _userName = sender.getNickname();
+    std::vector<std::string>::iterator it;
+    for (it = this->_opMembers.begin(); it != this->_opMembers.end(); it++)
+    {
+        if ((*it) == _userName)
+            return true;
+    }
+    return false;
+}
+
+
 bool    Channel::userOfChannel(User& sender)
 {
     std::string _userName = sender.getNickname();
@@ -149,6 +162,12 @@ void    Channel::removeUser(User& sender)
         }
     }
     std::cout << "User erased" << std::endl;
+    return ;
+}
+
+void    Channel::setTopic(std::string new_topic)
+{
+    this->_topic = new_topic;
     return ;
 }
 
