@@ -69,6 +69,7 @@ bool    _parcing(std::string buffer, User& sender, std::map<std::string, Channel
             break;
         case PRIVMSG:           // message ressemble a ca "PRIVMSG #hello :salut"
             privmsg(buffers, sender, channelList, userList);
+            break;
         case TOPIC:
             topic(buffers, sender, channelList);
             break;

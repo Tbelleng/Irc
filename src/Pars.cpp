@@ -1,7 +1,8 @@
 #include "Pars.hpp"
 
 Command parseCommand(const std::string& cmd) {
-    //std::cout << "On Va faire la commande" << cmd << std::endl;
+    std::cout << "On Va faire la commande" << cmd << std::endl;
+    
     if (cmd == "MODE") {
         return MODE;
     } else if (cmd == "KICK") {
@@ -13,6 +14,7 @@ Command parseCommand(const std::string& cmd) {
     } else if (cmd == "PASS") {
         return PASS;
     } else if (cmd == "TOPIC") {
+        std::cout << "cdm returned : TOPIC" << std::endl;
         return TOPIC;
     } else if (cmd == "USER") {
         return USER;
@@ -21,6 +23,7 @@ Command parseCommand(const std::string& cmd) {
     } else if (cmd == "NICK") {
         return NICK;
     } else if (cmd == "PRIVMSG") {
+        std::cout << "cdm returned : PRIVMSG" << std::endl;
         return PRIVMSG;
     }
     return UNKNOWN;
@@ -231,6 +234,7 @@ void    part(std::vector<std::string> buffers, User& sender, std::map<std::strin
             //TOPIC FUNCTION 
 void    topic(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList)
 {
+    std::cout << "ON PASSE DANS TOPIC" << std::endl;
     if (buffers.size() < 3 || buffers[1].empty() || buffers[1][0] != '#' || buffers[2].empty() || buffers[2][0] != ':') 
     {
         sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
@@ -305,6 +309,7 @@ void    kick(std::vector<std::string> buffers, User& sender, std::map<std::strin
             std::cout << "conditions remplies pour kick" << std::endl;
             User& to_kick = getUserByName(userList, user_to_kick);
             sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost KICK " + channel_name + " " + user_to_kick + " " + "\r\n");
+            it->second->broadcasting(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost KICK " + channel_name + " " + user_to_kick + " " + "\r\n", sender.GetUserFd());
             it->second->removeUser(to_kick);
             return;
         }
