@@ -246,8 +246,11 @@ void    topic(std::vector<std::string> buffers, User& sender, std::map<std::stri
             {
                 it->second->setTopic(new_topic);
                 sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " TOPIC " + it->second->getName() + " :" + it->second->getTopic() + "\r\n");
+                it->second->broadcasting(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " TOPIC " + it->second->getName() + " :" + it->second->getTopic() + "\r\n", sender.GetUserFd());
                 return ;
             }
         }
     }
+    sender.sendMsg("482 " + sender.getNickname() + " " + channel_name + " :You're not channel operator on this channel\r\n");
+    return ;
 }
