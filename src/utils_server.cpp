@@ -59,7 +59,7 @@ bool    _parcing(std::string buffer, User& sender, std::map<std::string, Channel
             //mode(buffers, sender);
             break;
         case KICK:
-            //kick(buffers, sender, channelList, userList);
+            kick(buffers, sender, channelList, userList);
             break;
         case PART:
             part(buffers, sender, channelList);

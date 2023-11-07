@@ -130,6 +130,17 @@ bool    Channel::userOfChannel(User& sender)
     return false;
 }
 
+bool    Channel::checkByName(std::string name_to_check)
+{
+    std::vector<std::string>::iterator it;
+    for (it = this->_members.begin(); it != this->_members.end(); it++)
+    {
+        if ((*it) == name_to_check)
+            return true;
+    }
+    return false;
+}
+
 void    Channel::removeUser(User& sender)
 {
     std::string _userName = sender.getNickname();

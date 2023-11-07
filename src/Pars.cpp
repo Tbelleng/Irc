@@ -254,3 +254,61 @@ void    topic(std::vector<std::string> buffers, User& sender, std::map<std::stri
     sender.sendMsg("482 " + sender.getNickname() + " " + channel_name + " :You're not channel operator on this channel\r\n");
     return ;
 }
+
+        //KICK FUNCTION
+User&   getUserByName(std::map<int, User*>& userList, std::string user_to_kick)
+{
+    for (std::map<int, User*>::iterator it = userList.begin(); it != userList.end(); ++it) 
+    {
+        if (it->second->getNickname() == user_to_kick) 
+        {
+            return *(it->second); // Return a reference to the found User
+        }
+    }
+    User* no_user = new User("default");
+    return *(no_user);
+}
+        
+void    kick(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
+{
+    if (buffers.size() < 3 || buffers[1].empty()) {
+        sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
+        return;
+    }
+    if (buffers[1].empty() || buffers[1][0] != '#') 
+    {
+        sender.sendMsg(": 403 " + sender.getNickname() + " " + buffers[1] + " :No such channel\r\n");
+        if (buffers[2][0] != ':') {
+            sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
+            return;
+        }
+        return;
+    }
+    std::string channel_name = removeSpecificSpaces(buffers[1]);
+    std::string user_to_kick = removeSpecificSpaces(buffers[2]);
+    for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
+    {
+        if (!it->first.empty() && it->first == channel_name)
+        {
+            if (!it->second->opOfChannel(sender))
+            {
+                std::cout << "Le sender n'est pas operator" << std::endl;
+                sender.sendMsg("482 " + sender.getNickname() + " :You're not channel operator\r\n");
+                return ;
+            }
+            if (!it->second->checkByName(user_to_kick)) 
+            {
+                std::cout << "La target n'est pas dans la channel" << std::endl;
+                sender.sendMsg("441 " + user_to_kick + " : User not on channel\r\n");
+                return;
+            }
+            std::cout << "conditions remplies pour kick" << std::endl;
+            User& to_kick = getUserByName(userList, user_to_kick);
+            sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost KICK " + channel_name + " " + user_to_kick + " " + "\r\n");
+            it->second->removeUser(to_kick);
+            return;
+        }
+    }
+    sender.sendMsg("442 " + sender.getNickname() + " :You're not on that channel\r\n");
+    return ;
+}

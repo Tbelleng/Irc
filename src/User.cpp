@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/12 15:58:09 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/11/03 15:20:17 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/11/07 16:51:35 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,12 @@ User::User(std::string& Nickname, std::string& password, std::string& hostname, 
 	this->hostname = hostname;
 	this->userFd = user_fd;
 
+	return ;
+}
+
+User::User(std::string name)
+{
+	this->nickname = name;
 	return ;
 }
 
