@@ -56,7 +56,7 @@ bool    _parcing(std::string buffer, User& sender, std::map<std::string, Channel
     
      switch (cmd){
         case MODE:
-            //mode(buffers, sender);
+            mode(buffers, sender, channelList, userList);
             break;
         case KICK:
             kick(buffers, sender, channelList, userList);
@@ -70,6 +70,9 @@ bool    _parcing(std::string buffer, User& sender, std::map<std::string, Channel
         case PRIVMSG:           // message ressemble a ca "PRIVMSG #hello :salut"
             privmsg(buffers, sender, channelList, userList);
             break;
+        case INVITE:
+            invite(buffers, sender, channelList, userList);
+            break;
         case TOPIC:
             topic(buffers, sender, channelList);
             break;
@@ -79,7 +82,7 @@ bool    _parcing(std::string buffer, User& sender, std::map<std::string, Channel
         case QUIT:
             //quit(buffers, sender);
             break;
-         case NICK:
+        case NICK:
             nick(buffers, sender, userList);
             break;
         default :

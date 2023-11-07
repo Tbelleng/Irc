@@ -11,10 +11,11 @@ Command parseCommand(const std::string& cmd) {
         return PART;
     } else if (cmd == "JOIN") {
         return JOIN;
+    } else if (cmd == "INVITE") {
+        return INVITE;
     } else if (cmd == "PASS") {
         return PASS;
     } else if (cmd == "TOPIC") {
-        std::cout << "cdm returned : TOPIC" << std::endl;
         return TOPIC;
     } else if (cmd == "USER") {
         return USER;
@@ -23,7 +24,6 @@ Command parseCommand(const std::string& cmd) {
     } else if (cmd == "NICK") {
         return NICK;
     } else if (cmd == "PRIVMSG") {
-        std::cout << "cdm returned : PRIVMSG" << std::endl;
         return PRIVMSG;
     }
     return UNKNOWN;
@@ -316,4 +316,65 @@ void    kick(std::vector<std::string> buffers, User& sender, std::map<std::strin
     }
     sender.sendMsg("442 " + sender.getNickname() + " :You're not on that channel\r\n");
     return ;
+}
+
+        //INVITE FUNCTION
+        
+bool    isValideChannel(std::map<std::string, Channel*>& channelList, std::string channel_name)
+{
+    for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
+    {
+        if (!it->first.empty() && it->first == channel_name)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void    invite(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
+{
+    if (buffers.size() < 3 || buffers[1].empty() || buffers[2].empty()) {
+        sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
+        return;
+    }
+    std::string channel_name = removeSpecificSpaces(buffers[2]);
+    std::string user_to_invite = removeSpecificSpaces(buffers[1]);
+    if (!isValideChannel(channelList, channel_name))
+    {
+        sender.sendMsg("403 " + sender.getNickname() + " " + channel_name + " :No such channel\r\n");
+        return;
+    }
+    
+    for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
+    {
+        if (!it->first.empty() && it->first == channel_name)
+        {
+            if(!it->second->opOfChannel(sender))
+            {
+                sender.sendMsg("482 " + sender.getNickname() + " " + channel_name + " :You're not channel operator\r\n");
+                return;
+            }
+            //verifier si le user est un user qui existe dans le serveur
+            
+            if(it->second->checkByName(user_to_invite))
+            {
+                sender.sendMsg("443 " + user_to_invite + " :Already in the channel\r\n");
+                return;
+            }
+            
+        }
+    }
+
+}
+
+
+
+        //MODE FUNCTION
+void    mode(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
+{
+
+
+
+
 }
