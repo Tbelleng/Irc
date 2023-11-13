@@ -55,7 +55,7 @@ You should run this command in irssi:
 
 ### Communication Protocol
 - [X] Define and document the IRC communication protocol.
-- [ ] Ensure proper encoding and decoding of IRC messages.
+- [X] Ensure proper encoding and decoding of IRC messages.
 
 ### Testing and Quality Assurance
 - [ ] Write unit tests for server and client components.
