@@ -49,6 +49,8 @@ class Channel
 	bool                       userOfChannel(User& sender);
 	bool                       checkByName(std::string name_to_check);
 	void                       removeUser(User& sender);
+	void                       modeO(std::string flag, std::string target);
+	void                       modeSwitch(std::string flag);
 	
     void                suppMember(int opMember, int suppMember);
     void                suppOpMember(int opMember, int suppOpMember);

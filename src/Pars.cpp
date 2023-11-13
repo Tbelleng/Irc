@@ -346,7 +346,6 @@ void    invite(std::vector<std::string> buffers, User& sender, std::map<std::str
         sender.sendMsg("403 " + sender.getNickname() + " " + channel_name + " :No such channel\r\n");
         return;
     }
-    
     for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
     {
         if (!it->first.empty() && it->first == channel_name)
@@ -383,22 +382,18 @@ void    invite(std::vector<std::string> buffers, User& sender, std::map<std::str
         //MODE FUNCTION
 void    mode(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
 {
-    if (buffers.size() != 3)
+    if (buffers.size() < 3)
     {
         sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
         return;
     }
-    if (buffers[1][0] != '#')
+    std::string channel_name = removeSpecificSpaces(buffers[1]);
+    if (!isValideChannel(channelList, channel_name) || buffers[1][0] != '#')
     {
-        sender.sendMsg("403 " + sender.getNickname() + " " + buffers[1] + " :No such channel\r\n");
+        sender.sendMsg("403 " + sender.getNickname() + " " + channel_name + " :No such channel\r\n");
         return;
     }
     if (!valideFlag(buffers[2]))
     {
         sender.sendMsg("501 " + sender.getNickname() + " :Unknown MODE flag\r\n");
-        return ;
-    }
-
-
-
-}
+        return 
