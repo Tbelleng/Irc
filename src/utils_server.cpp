@@ -55,9 +55,9 @@ bool    _parcing(std::string buffer, User& sender, std::map<std::string, Channel
     (void)channelList;
     
      switch (cmd){
-        // case MODE:
-        //     mode(buffers, sender, channelList, userList);
-        //     break;
+        case MODE:
+            mode(buffers, sender, channelList, userList);
+            break;
         case KICK:
             kick(buffers, sender, channelList, userList);
             break;

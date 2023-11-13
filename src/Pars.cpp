@@ -341,7 +341,7 @@ void    invite(std::vector<std::string> buffers, User& sender, std::map<std::str
     std::string channel_name = removeSpecificSpaces(buffers[2]);
     std::string user_to_invite = removeSpecificSpaces(buffers[1]);
     bool user_exist = userInServer(user_to_invite, userList);
-    if (!isValideChannel(channelList, channel_name))
+    if (!isValideChannel(channelList, channel_name) || buffers[2][0] != '#')
     {
         sender.sendMsg("403 " + sender.getNickname() + " " + channel_name + " :No such channel\r\n");
         return;
@@ -368,7 +368,10 @@ void    invite(std::vector<std::string> buffers, User& sender, std::map<std::str
             }
             //trouver l'user et lui envoyer le message d'invitation
             User* to_invite = whichUser(user_to_invite, userList);
-            to_invite->sendMsg(":" + to_invite->getNickname() + "!~" + to_invite->getNickname() + "@localhost" + " INVITE " + user_to_invite + " " + channel_name + "\r\n");
+            to_invite->sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " INVITE " + user_to_invite + " " + channel_name + "\r\n");
+            //ajouter le user a la channel
+            it->second->addInvited(to_invite->getNickname());
+            return;
         }
     }
     std::cout << " FIN de la fonction INVITE" << std::endl;
@@ -378,10 +381,24 @@ void    invite(std::vector<std::string> buffers, User& sender, std::map<std::str
 
 
         //MODE FUNCTION
-// void    mode(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
-// {
+void    mode(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
+{
+    if (buffers.size() != 3)
+    {
+        sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
+        return;
+    }
+    if (buffers[1][0] != '#')
+    {
+        sender.sendMsg("403 " + sender.getNickname() + " " + buffers[1] + " :No such channel\r\n");
+        return;
+    }
+    if (!valideFlag(buffers[2]))
+    {
+        sender.sendMsg("501 " + sender.getNickname() + " :Unknown MODE flag\r\n");
+        return ;
+    }
 
 
 
-
-// }
+}

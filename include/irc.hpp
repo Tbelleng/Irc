@@ -47,5 +47,6 @@ void    _send(const char* message, int member);
 std::vector<std::string>    ft_split(const std::string& inputString);
 bool    userInServer(std::string userName, std::map<int, User*>& userList);
 User* whichUser(std::string userName, std::map<int, User*>& userList);
+bool    valideFlag(std::string flag);
 
 #endif

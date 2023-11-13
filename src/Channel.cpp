@@ -63,6 +63,12 @@ void    Channel::addMember(User& client)
     return ;
 }
 
+void    Channel::addInvited(std::string username)
+{
+    this->_invitedUsers.push_back(username);
+    return ;
+}
+
 void    Channel::increaseCurrentUser(void)
 {
     this->_currentUsers++;

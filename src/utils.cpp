@@ -51,6 +51,15 @@ User* whichUser(std::string userName, std::map<int, User*>& userList)
     return NULL;
 }
 
+bool    valideFlag(std::string flag)
+{
+    if (flag[0] != '-' && flag[0] != '+')
+        return false;
+    if (flag[1] != 'i' && flag[1] != 't' && flag[1] != 'k' && flag[1] != 'o' && flag[1] != 'l')
+        return false;
+        
+    return true;
+}
 // void    _send(const char* message, int member, int epfd, struct epoll_event& ev) {
 //     ev.events = EPOLLOUT;
 //     ev.data.fd = member;
