@@ -340,6 +340,7 @@ void    invite(std::vector<std::string> buffers, User& sender, std::map<std::str
     }
     std::string channel_name = removeSpecificSpaces(buffers[2]);
     std::string user_to_invite = removeSpecificSpaces(buffers[1]);
+    bool user_exist = userInServer(user_to_invite, userList);
     if (!isValideChannel(channelList, channel_name))
     {
         sender.sendMsg("403 " + sender.getNickname() + " " + channel_name + " :No such channel\r\n");
@@ -355,26 +356,32 @@ void    invite(std::vector<std::string> buffers, User& sender, std::map<std::str
                 sender.sendMsg("482 " + sender.getNickname() + " " + channel_name + " :You're not channel operator\r\n");
                 return;
             }
-            //verifier si le user est un user qui existe dans le serveur
-            
             if(it->second->checkByName(user_to_invite))
             {
                 sender.sendMsg("443 " + user_to_invite + " :Already in the channel\r\n");
                 return;
             }
-            
+            if (user_exist == false)
+            {
+                sender.sendMsg("401 " + user_to_invite + " :No such nick\r\n");
+                return;
+            }
+            //trouver l'user et lui envoyer le message d'invitation
+            User* to_invite = whichUser(user_to_invite, userList);
+            to_invite->sendMsg(":" + to_invite->getNickname() + "!~" + to_invite->getNickname() + "@localhost" + " INVITE " + user_to_invite + " " + channel_name + "\r\n");
         }
     }
-
+    std::cout << " FIN de la fonction INVITE" << std::endl;
+    return ;
 }
 
 
 
         //MODE FUNCTION
-void    mode(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
-{
+// void    mode(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
+// {
 
 
 
 
-}
+// }

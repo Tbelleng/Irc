@@ -24,6 +24,33 @@ std::vector<std::string> ft_split(const std::string& inputString)
 
     return result;
 }
+
+bool    userInServer(std::string userName, std::map<int, User*>& userList)
+{
+    std::map<int, User*>::iterator it;
+    for (it = userList.begin() ; it != userList.end(); it++)
+    {
+        if (it->second->getNickname() == userName)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+User* whichUser(std::string userName, std::map<int, User*>& userList)
+{
+    std::map<int, User*>::iterator it;
+    for (it = userList.begin() ; it != userList.end(); it++)
+    {
+        if (it->second->getNickname() == userName)
+        {
+            return (it->second);
+        }
+    }
+    return NULL;
+}
+
 // void    _send(const char* message, int member, int epfd, struct epoll_event& ev) {
 //     ev.events = EPOLLOUT;
 //     ev.data.fd = member;
