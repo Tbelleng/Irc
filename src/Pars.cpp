@@ -396,4 +396,31 @@ void    mode(std::vector<std::string> buffers, User& sender, std::map<std::strin
     if (!valideFlag(buffers[2]))
     {
         sender.sendMsg("501 " + sender.getNickname() + " :Unknown MODE flag\r\n");
-        return 
+        return ;
+    }
+    for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
+    {
+        if (!it->first.empty() && it->first == channel_name)
+        {
+            if(!it->second->opOfChannel(sender))
+            {
+                sender.sendMsg("482 " + sender.getNickname() + " " + channel_name + " :You're not channel operator\r\n");
+                return;
+            }
+            // ici c'est pour le mode -o
+            if (buffers[2][1] == 'o')
+            {
+                if (buffers[3].empty())
+                {
+                    sender.sendMsg("501 " + sender.getNickname() + " :This flag need a target\r\n");
+                    return ;
+                }
+                it->second->modeO(buffers[3]);
+            }
+            // ici c'est pour les autres modes
+            it->second->modeSwitch(buffers[2]);
+            return;
+        }
+    }
+
+}
