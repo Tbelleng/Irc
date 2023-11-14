@@ -415,7 +415,8 @@ void    mode(std::vector<std::string> buffers, User& sender, std::map<std::strin
                     sender.sendMsg("501 " + sender.getNickname() + " :This flag need a target\r\n");
                     return ;
                 }
-                it->second->modeO(buffers[3]);
+                it->second->modeO(buffers[2], buffers[3], sender);
+                return ;
             }
             // ici c'est pour les autres modes
             it->second->modeSwitch(buffers[2]);

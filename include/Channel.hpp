@@ -49,7 +49,7 @@ class Channel
 	bool                       userOfChannel(User& sender);
 	bool                       checkByName(std::string name_to_check);
 	void                       removeUser(User& sender);
-	void                       modeO(std::string flag, std::string target);
+	void                       modeO(std::string flag, std::string target, User& sender);
 	void                       modeSwitch(std::string flag);
 	
     void                suppMember(int opMember, int suppMember);

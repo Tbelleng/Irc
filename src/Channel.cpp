@@ -188,20 +188,50 @@ void    Channel::setTopic(std::string new_topic)
     return ;
 }
 
-void    modeO(std::string flag, std::string target)
+void    Channel::modeO(std::string flag, std::string target, User& sender)
 {
     bool sign = false;
     if (flag[0] == '+')
         sign = true;
     if (sign == true)
     {
-        
+        for(std::vector<std::string>::iterator it = this->_opMembers.begin(); it != this->_opMembers.end(); it++)
+        {
+            if (*it == target)
+            {
+                sender.sendMsg("441 " + target + " :User already Operator\r\n");
+                return ;
+            }
+        }
+        this->_opMembers.push_back(target);
+        sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + target + " +o " + (*us)->getNickName() + "\r\n");
+        this->broadcasting("381 " + target + " :Is now an Operator in this channel\r\n", sender.GetUserFd());
+        return ;
     }
+    else
+    {
+        for(std::vector<std::string>::iterator it = this->_opMembers.begin(); it != this->_opMembers.end(); it++)
+        {
+            if (*it == sender.getNickname())
+            {
+                 it->sendMsg("ERROR: You can't remove yourself from operator status\r\n");
+                return ;
+            }
+            if (*it == target)
+            {
+                this->_opMembers.remove(it);
+                sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + target + " -o " + this->getName() + "\r\n");
+                return ;
+            }
+        }
+    }
+    std::cout << "fin de mode o" << std::endl;
+    return ;
 }
 
-void    modeSwitch(std::string flag)
+void    Channel::modeSwitch(std::string flag)
 {
-    
+    (void)flag;
 }
 
 std::string vectorToString(const std::vector<std::string>& buffer) 
