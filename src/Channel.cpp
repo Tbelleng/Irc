@@ -94,6 +94,12 @@ void    Channel::setMaxUsers(bool mode)
     return ;
 }
 
+void    Channel::settingPass(bool mode)
+{
+    this->_needPass = mode;
+    return ;
+}
+
 void    Channel::joinBroadcast(User& sender)
 {
     std::string msg = ":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " JOIN " + this->getName() + "\r\n";
@@ -261,7 +267,27 @@ void    Channel::modeSwitch(std::string flag, User& sender)
             return ;
         }
     }
-    // if (flag[1] == '')
+    //pour le -k/+k
+    else if (flag[1] == 'k')
+    {
+        bool sign = false;
+        if (flag[0] == '+')
+            sign = true;
+        if (sign == true)
+        {
+            this->settingPass(true);
+            sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
+            this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
+            return ;
+        }
+        else
+        {
+            this->settingPass(false);
+            sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
+            this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
+            return ;
+        }
+    }
 }
 
 std::string vectorToString(const std::vector<std::string>& buffer) 

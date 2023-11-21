@@ -46,6 +46,7 @@ class Channel
 	void                       joinBroadcast(User& sender);
 	void                       broadcasting(std::string msg, int sender_fd);
 	void                       setMaxUsers(bool mode);
+	void                       settingPass(bool mode);
 	
 	bool                       opOfChannel(User& sender);
 	bool                       userOfChannel(User& sender);
