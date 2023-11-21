@@ -382,6 +382,8 @@ void    invite(std::vector<std::string> buffers, User& sender, std::map<std::str
         //MODE FUNCTION
 void    mode(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
 {
+    (void)userList;
+    std::cout << "on entre dans la fonction mode" << std::endl;
     if (buffers.size() < 3)
     {
         sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
@@ -419,9 +421,10 @@ void    mode(std::vector<std::string> buffers, User& sender, std::map<std::strin
                 return ;
             }
             // ici c'est pour les autres modes
-            it->second->modeSwitch(buffers[2]);
+            it->second->modeSwitch(buffers[2], sender);
             return;
         }
     }
-
+    sender.sendMsg("472 " + sender.getNickname() + " " + buffers[2] + " :is unknown mode \r\n");
+    return ;
 }

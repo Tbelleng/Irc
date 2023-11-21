@@ -16,6 +16,7 @@ class Channel
 	unsigned int _currentUsers;
 	bool _needPass;
 	bool _onlyInvite;
+	bool _maxSet;
 
   public:
 
@@ -44,13 +45,14 @@ class Channel
 	std::string                getUserList(void);
 	void                       joinBroadcast(User& sender);
 	void                       broadcasting(std::string msg, int sender_fd);
+	void                       setMaxUsers(bool mode);
 	
 	bool                       opOfChannel(User& sender);
 	bool                       userOfChannel(User& sender);
 	bool                       checkByName(std::string name_to_check);
 	void                       removeUser(User& sender);
 	void                       modeO(std::string flag, std::string target, User& sender);
-	void                       modeSwitch(std::string flag);
+	void                       modeSwitch(std::string flag, User& sender);
 	
     void                suppMember(int opMember, int suppMember);
     void                suppOpMember(int opMember, int suppOpMember);

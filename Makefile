@@ -28,7 +28,7 @@ $(OBJS_DIR)%.o: $(SRC_DIR)%.cpp | $(OBJS_DIR)
 $(NAME): $(OBJS)
 	@clear
 	@echo "\033[1;34m                                                                                                                     "
-	@echo "    Loading quantum version..."
+	@echo "Loading quantum version..."
 	@echo "Project name: $(NAME)"
 	@echo "\n\033[1;32mCompilation... ⌛\033[0;m\n"
 	@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)

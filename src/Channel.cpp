@@ -20,6 +20,7 @@ Channel::Channel(std::string name, std::string username, std::string pass, User&
     this->_onlyInvite = false;
     this->_currentUsers++;
     this->_maxUsers = 10;
+    this->_maxSet = true;
     this->_currentUsers = 1;
     return ;
 }
@@ -85,6 +86,12 @@ std::string    Channel::getUserList(void)
     }
     std::cout << "La USER LIST =" << result << std::endl;
     return (result);
+}
+
+void    Channel::setMaxUsers(bool mode)
+{
+    this->_maxSet = mode;
+    return ;
 }
 
 void    Channel::joinBroadcast(User& sender)
@@ -193,6 +200,7 @@ void    Channel::modeO(std::string flag, std::string target, User& sender)
     bool sign = false;
     if (flag[0] == '+')
         sign = true;
+    std::cout << "On passe dans la fonction mode o" << std::endl;
     if (sign == true)
     {
         for(std::vector<std::string>::iterator it = this->_opMembers.begin(); it != this->_opMembers.end(); it++)
@@ -204,7 +212,8 @@ void    Channel::modeO(std::string flag, std::string target, User& sender)
             }
         }
         this->_opMembers.push_back(target);
-        sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + target + " +o " + (*us)->getNickName() + "\r\n");
+        std::cout << "sender name and FD = " << sender.getNickname() << " " << sender.GetUserFd() << std::endl;
+        sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + target + " +o " + this->getName() + "\r\n");
         this->broadcasting("381 " + target + " :Is now an Operator in this channel\r\n", sender.GetUserFd());
         return ;
     }
@@ -214,12 +223,12 @@ void    Channel::modeO(std::string flag, std::string target, User& sender)
         {
             if (*it == sender.getNickname())
             {
-                 it->sendMsg("ERROR: You can't remove yourself from operator status\r\n");
+                sender.sendMsg("ERROR: You can't remove yourself from operator status\r\n");
                 return ;
             }
             if (*it == target)
             {
-                this->_opMembers.remove(it);
+                this->_opMembers.erase(it);
                 sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + target + " -o " + this->getName() + "\r\n");
                 return ;
             }
@@ -229,9 +238,30 @@ void    Channel::modeO(std::string flag, std::string target, User& sender)
     return ;
 }
 
-void    Channel::modeSwitch(std::string flag)
+void    Channel::modeSwitch(std::string flag, User& sender)
 {
-    (void)flag;
+    //pour le signe +l/-l
+    if (flag[1] == 'l')
+    {
+        bool sign = false;
+        if (flag[0] == '+')
+            sign = true;
+        if (sign == true)
+        {
+            this->setMaxUsers(true);
+            sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
+            this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
+            return ;
+        }
+        else 
+        {
+            this->setMaxUsers(false);
+            sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
+            this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
+            return ;
+        }
+    }
+    // if (flag[1] == '')
 }
 
 std::string vectorToString(const std::vector<std::string>& buffer) 
