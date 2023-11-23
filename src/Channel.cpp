@@ -41,6 +41,22 @@ bool    Channel::needPass(void)
     return (this->_needPass);
 }
 
+bool    Channel::needInvit()
+{
+    return (this->_onlyInvite);
+}
+
+bool    Channel::checkInvit(std::string username)
+{
+    std::vector<std::string>::iterator it;
+    for (it = this->_invitedUsers.begin(); it != this->_invitedUsers.end(); it++)
+    {
+        if ((*it) == username)
+            return true;
+    }
+    return false;
+}
+
 std::string    Channel::getPassword(void)
 {
     return (this->_password);
@@ -201,6 +217,12 @@ void    Channel::setTopic(std::string new_topic)
     return ;
 }
 
+void    Channel::settingInvit(bool mode)
+{
+    this->_onlyInvite = mode;
+    return ;
+}
+
 void    Channel::modeO(std::string flag, std::string target, User& sender)
 {
     bool sign = false;
@@ -246,7 +268,7 @@ void    Channel::modeO(std::string flag, std::string target, User& sender)
 
 void    Channel::modeSwitch(std::string flag, User& sender)
 {
-    //pour le signe +l/-l
+    //pour le mode +l/-l
     if (flag[1] == 'l')
     {
         bool sign = false;
@@ -267,7 +289,7 @@ void    Channel::modeSwitch(std::string flag, User& sender)
             return ;
         }
     }
-    //pour le -k/+k
+    //pour le mode -k/+k
     else if (flag[1] == 'k')
     {
         bool sign = false;
@@ -283,6 +305,27 @@ void    Channel::modeSwitch(std::string flag, User& sender)
         else
         {
             this->settingPass(false);
+            sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
+            this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
+            return ;
+        }
+    }
+    //pour le mode -i/+i
+    else if (flag[1] == 'i')
+    {
+        bool sign = false;
+        if (flag[0] == '+')
+            sign = true;
+        if (sign == true)
+        {
+            this->settingInvit(true);
+            sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
+            this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
+            return ;
+        }
+        else
+        {
+            this->settingInvit(false);
             sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
             this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
             return ;

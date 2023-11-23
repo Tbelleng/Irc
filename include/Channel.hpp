@@ -37,6 +37,8 @@ class Channel
 	std::string                getTopic(void);
 	std::string                getPassword(void);
 	bool                       needPass(void);
+	bool					   needInvit(void);
+	bool					   checkInvit(std::string username);
 	unsigned int               getMaxUsers(void);
 	unsigned int               getCurrentUsers(void);
 	void                       addMember(User& client);
@@ -47,6 +49,7 @@ class Channel
 	void                       broadcasting(std::string msg, int sender_fd);
 	void                       setMaxUsers(bool mode);
 	void                       settingPass(bool mode);
+	void					   settingInvit(bool mode);
 	
 	bool                       opOfChannel(User& sender);
 	bool                       userOfChannel(User& sender);

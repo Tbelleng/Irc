@@ -68,12 +68,19 @@ void    nick(std::vector<std::string> buffers, User& sender, std::map<int, User*
                 // JOIN FUNCTION //
 void    channelExist(Channel& current_channel, User& sender, std::map<std::string, Channel*>& channelList, std::string channel_pass)
 {
-    //Rajouter ici une fonction si la Channel est en invite Only (regarder si le User a ete add aux operators)
     std::cout << "LA CHANNEL EXISTE" << std::endl;
-    if(current_channel.needPass() == true && current_channel.getPassword() != channel_pass)
+    if(current_channel.needPass() == true && current_channel.getPassword() != channel_pass && current_channel.needInvit() == false)
     {
         sender.sendMsg("475 " + sender.getNickname() + " " + current_channel.getName() + " :Cannot join channel (+k)\r\n");
         return ;
+    }
+    if(current_channel.needInvit() == true)
+    {
+        if(!current_channel.checkInvit(sender.getNickname()))
+        {
+            sender.sendMsg("471 " + sender.getNickname() + " " + current_channel.getName() + " :Cannot join Channel, You need an invitation\r\n");
+            return ;
+        }
     }
     if(current_channel.getCurrentUsers() == current_channel.getMaxUsers())
     {
