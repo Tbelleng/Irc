@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/11/04 17:35:01 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/11/23 17:21:22 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,18 @@ Server::Server(int port, std::string password)
 //******************************Class Destructor***************************
 Server::~Server(void)
 {
+    std::map<int, User*>::iterator it;
+    for (it = this->userList.begin(); it != this->userList.end(); it++)
+    {
+        delete (it->second);
+    }
+    this->userList.clear();
+    std::map<std::string, Channel*>::iterator itt;
+    for (itt = this->channelList.begin(); itt != this->channelList.end(); itt++)
+    {
+        delete (it->second);
+    }
+    this->channelList.clear();
 	std::cout << "Server Destroyed" << std::endl;
 }
 //*************************************************************************
@@ -148,7 +160,7 @@ void	Server::handleClientRequest(int user_fd)
 	    fcntl(user_fd, F_SETFL, O_NONBLOCK);
 	    if (!this->GetUserInfo(user_fd, message))
 	    {
-	            std::string error = "Wrong format for registration, you cant connect";
+	            std::string error = "Wrong format for registration / Wrong server password, retry...";
 	            send(user_fd, error.c_str(), error.size(), MSG_DONTWAIT);
 	            close(user_fd);
 	            return ;
@@ -220,8 +232,7 @@ int Server::GetUserInfo(int user_fd, std::string& buffer)
     
     if (username.empty())
         username = "stud42";
-    
-    if (nickname.empty() || password.empty() || username.empty()) 
+    if (nickname.empty() || password.empty() || username.empty() || password != this->getPassword()) 
     {
         return 0;
     }

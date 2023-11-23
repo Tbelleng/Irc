@@ -397,7 +397,9 @@ void    mode(std::vector<std::string> buffers, User& sender, std::map<std::strin
         return;
     }
     std::string channel_name = removeSpecificSpaces(buffers[1]);
-    if (!isValideChannel(channelList, channel_name) || buffers[1][0] != '#')
+    if (buffers[1][0] != '#')
+        return ;
+    if (!isValideChannel(channelList, channel_name))
     {
         sender.sendMsg("403 " + sender.getNickname() + " " + channel_name + " :No such channel\r\n");
         return;
