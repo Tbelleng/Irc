@@ -17,6 +17,7 @@ class Channel
 	bool _needPass;
 	bool _onlyInvite;
 	bool _maxSet;
+	bool _topicMode;
 
   public:
 
@@ -50,6 +51,8 @@ class Channel
 	void                       setMaxUsers(bool mode);
 	void                       settingPass(bool mode);
 	void					   settingInvit(bool mode);
+	void					   topicMode(bool mode);
+	bool   					   getTopicMode(void);
 	
 	bool                       opOfChannel(User& sender);
 	bool                       userOfChannel(User& sender);

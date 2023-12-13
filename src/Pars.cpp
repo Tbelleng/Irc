@@ -253,6 +253,11 @@ void    topic(std::vector<std::string> buffers, User& sender, std::map<std::stri
     {
         if (!it->first.empty() && it->first == channel_name)
         {
+            if (it->second->getTopicMode() == false)
+            {
+                sender.sendMsg("331 " + sender.getNickname() + " " + channel_name + " :No topic is set\r\n");
+                return ;
+            }
             if (it->second->opOfChannel(sender))
             {
                 it->second->setTopic(new_topic);
@@ -387,15 +392,14 @@ void    invite(std::vector<std::string> buffers, User& sender, std::map<std::str
 }
 
 
-
         //MODE FUNCTION
 void    mode(std::vector<std::string> buffers, User& sender, std::map<std::string, Channel*>& channelList, std::map<int, User*>& userList)
 {
     (void)userList;
     std::cout << "on entre dans la fonction mode" << std::endl;
-    if (buffers.size() < 3)
+    if (buffers.size() < 3 || buffers.size() > 4)
     {
-        sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough Parameters\r\n");
+        sender.sendMsg(":" + sender.getNickname() + " 461 :Not Enough or too many Parameters\r\n");
         return;
     }
     std::string channel_name = removeSpecificSpaces(buffers[1]);
@@ -426,11 +430,12 @@ void    mode(std::vector<std::string> buffers, User& sender, std::map<std::strin
             {
                 if (buffers.size() < 4)
                 {
-                    sender.sendMsg(":" + sender.getNickname() + " 501 :Need a Target\r\n");
+                    sender.sendMsg("461" + sender.getNickname() + " :Not enough parameters\r\n");
                     return ;
                 }
-                it->second->broadcasting("324 " + sender.getNickname() + " " + channel_name + " :Channel mode changed!\r\n", sender.GetUserFd());
-                it->second->modeO(buffers[2], buffers[3], sender);
+                std::string target = removeSpecificSpaces(buffers[3]);
+                it->second->broadcasting("324 " + sender.getNickname() + " " + channel_name + " :Channel mode changed on Operators!\r\n", sender.GetUserFd());
+                it->second->modeO(buffers[2], target, sender);
                 return ;
             }
             // ici c'est pour les autres modes

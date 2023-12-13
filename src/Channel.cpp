@@ -22,6 +22,7 @@ Channel::Channel(std::string name, std::string username, std::string pass, User&
     this->_maxUsers = 10;
     this->_maxSet = true;
     this->_currentUsers = 1;
+    this->_topicMode = true;
     return ;
 }
 
@@ -223,6 +224,17 @@ void    Channel::settingInvit(bool mode)
     return ;
 }
 
+void    Channel::topicMode(bool mode)
+{
+    this->_topicMode = mode;
+    return ;
+}
+
+bool   Channel::getTopicMode(void)
+{
+    return (this->_topicMode);
+}
+
 void    Channel::modeO(std::string flag, std::string target, User& sender)
 {
     bool sign = false;
@@ -326,6 +338,27 @@ void    Channel::modeSwitch(std::string flag, User& sender)
         else
         {
             this->settingInvit(false);
+            sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
+            this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
+            return ;
+        }
+    }
+    //pour le mode -t/+t
+    else if (flag[1] == 't')
+    {
+        bool sign = false;
+        if (flag[0] == '+')
+            sign = true;
+        if (sign == true)
+        {
+            this->topicMode(true);
+            sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
+            this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
+            return ;
+        }
+        else
+        {
+            this->topicMode(false);
             sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n");
             this->broadcasting((":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost" + " MODE " + this->getName() + " " + flag + "\r\n"), sender.GetUserFd());
             return ;
