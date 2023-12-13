@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 16:19:46 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/11/03 13:41:42 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/13 17:47:37 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 void runningServer(Server& irc)
 {
+	//std::signal(SIGINT, handleSIGINT);
     while (true)
     {
 		int open_fds = poll(&irc._pollfds[0], irc._pollfds.size(), -1);
@@ -37,8 +38,7 @@ void runningServer(Server& irc)
 			}
 		}
 	}
-
-
+	irc.~Server();
 }
 
 

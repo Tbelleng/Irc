@@ -318,10 +318,12 @@ void    kick(std::vector<std::string> buffers, User& sender, std::map<std::strin
             sender.sendMsg(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost KICK " + channel_name + " " + user_to_kick + " " + "\r\n");
             it->second->broadcasting(":" + sender.getNickname() + "!~" + sender.getNickname() + "@localhost KICK " + channel_name + " " + user_to_kick + " " + "\r\n", sender.GetUserFd());
             it->second->removeUser(to_kick);
+
             return;
         }
     }
     sender.sendMsg("442 " + sender.getNickname() + " :You're not on that channel\r\n");
+    
     return ;
 }
 
@@ -406,7 +408,7 @@ void    mode(std::vector<std::string> buffers, User& sender, std::map<std::strin
     }
     if (!valideFlag(buffers[2]))
     {
-        sender.sendMsg("501 " + sender.getNickname() + " :Unknown MODE flag\r\n");
+        sender.sendMsg(":" + sender.getNickname() + " 501 :Unknown MODE flag\r\n");
         return ;
     }
     for (std::map<std::string, Channel*>::const_iterator it = channelList.begin(); it != channelList.end(); ++it)
@@ -416,21 +418,24 @@ void    mode(std::vector<std::string> buffers, User& sender, std::map<std::strin
             if(!it->second->opOfChannel(sender))
             {
                 sender.sendMsg("482 " + sender.getNickname() + " " + channel_name + " :You're not channel operator\r\n");
+
                 return;
             }
             // ici c'est pour le mode -o
             if (buffers[2][1] == 'o')
             {
-                if (buffers[3].empty())
+                if (buffers.size() < 4)
                 {
-                    sender.sendMsg("501 " + sender.getNickname() + " :This flag need a target\r\n");
+                    sender.sendMsg(":" + sender.getNickname() + " 501 :Need a Target\r\n");
                     return ;
                 }
+                it->second->broadcasting("324 " + sender.getNickname() + " " + channel_name + " :Channel mode changed!\r\n", sender.GetUserFd());
                 it->second->modeO(buffers[2], buffers[3], sender);
                 return ;
             }
             // ici c'est pour les autres modes
             it->second->modeSwitch(buffers[2], sender);
+            it->second->broadcasting("324 " + sender.getNickname() + " " + channel_name + " :Channel mode changed!\r\n", sender.GetUserFd());
             return;
         }
     }

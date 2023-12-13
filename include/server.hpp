@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/11/04 19:08:29 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/13 17:47:21 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,15 @@
 #define SERVER_HPP
 
 # include "irc.hpp"
+#include <csignal>
+#include <cstdlib>
 
 struct  s_replie {
     int nbReplie;
     std::string rplReplie;
 };
+
+//int g_exitFlag = 1;
 
 class Server
 {

@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/11/23 17:21:22 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/13 17:46:54 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ void	Server::addingPoll(void)
     } 
     else
     {
-       
         _pollfds[0].fd = serverSocket;
         _pollfds[0].events = POLLIN;
         _pollfds[0].revents = 0;
@@ -153,7 +152,6 @@ void	Server::handleClientRequest(int user_fd)
 		int sfd = user_fd;
 		close(sfd);
 	}
-
 	std::string message(buf, 512);
 	if (this->ClientCheck(user_fd) == 0)
 	{
@@ -306,3 +304,10 @@ Channel* Server::findChannel(std::string& channelName, std::map<std::string, Cha
         return NULL; 
     return channelList[channelName];
 }
+
+// void handleSIGINT(int signal)
+// {
+//     std::cout << "Received SIGINT. Cleaning up and exiting..." << std::endl;
+//     //signal = 0;
+//     g_exitFlag = 1;
+// }
