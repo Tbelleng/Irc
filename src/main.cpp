@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 16:19:46 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/12/14 15:13:10 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/14 17:23:48 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,13 +65,17 @@ int main(int argc, char **argv)
         std::cout << " You have to input params as follow : /ircserv [port] [password] " << std::endl;
         return 1;
     }
-    int port = atoi(argv[1]);
-    if (port <= 0 || port > 60000)
-    {
-        std::cout << "Invalid Port" << std::endl;
-        return 1;
-    }
+	std::string portStr = std::string(argv[1]);
     std::string password = std::string(argv[2]);
+	
+	if (!parsing(portStr, password))
+	{
+		std::cout << "Error: port must be a valid number and password must be a valid string" << std::endl;
+		return (1);
+	}
+
+	unsigned int port = atoi(portStr.c_str());
+	
     Server *irc = new Server(port, password);
 
     irc->createSocket();

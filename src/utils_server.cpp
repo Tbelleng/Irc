@@ -92,3 +92,26 @@ bool    _parcing(std::string buffer, User& sender, std::map<std::string, Channel
 
     return 1;
 }
+
+bool valid_pwd(const std::string& pwd)
+{
+    if (pwd.empty() || pwd.size() < 1)
+        return false;
+    return true;
+}
+
+bool valid_port(const std::string& port)
+{
+    if (port.empty())
+        return false;
+    int p = atoi(port.c_str());
+
+    return (p >= 1024 && p <= 49151);
+}
+
+bool parsing(std::string& port, std::string& pwd)
+{
+	if (!valid_port(port) || !valid_pwd(pwd))
+		return false;
+	return true;
+}

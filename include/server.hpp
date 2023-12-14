@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/12/14 15:56:38 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/14 17:24:36 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ class Server
     static Channel* findChannel(std::string& channelName, std::map<std::string, Channel*>& channelList);
 
 };
-
+bool parsing(std::string& port, std::string& pwd);
 void    setReplie(std::vector<struct s_replie>* replie);
 bool    _parcing(std::string buffer, User* sender, std::map<std::string, Channel*> channelList, std::vector<User*> userList);
 std::string trimBuffers(const std::vector<std::string>& buffer);
