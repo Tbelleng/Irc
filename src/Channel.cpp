@@ -208,6 +208,15 @@ void    Channel::removeUser(User& sender)
             break;
         }
     }
+    std::vector<std::string>::iterator itttt;
+    for (itttt = this->_invitedUsers.begin(); itttt != this->_invitedUsers.end(); itttt++)
+    {
+        if ((*itttt) == _userName)
+        {
+            this->_invitedUsers.erase(itttt);
+            break;
+        }
+    }
     std::cout << "User erased" << std::endl;
     return ;
 }

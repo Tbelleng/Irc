@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/12/13 17:46:54 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/14 16:37:35 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ Server::~Server(void)
     std::map<int, User*>::iterator it;
     for (it = this->userList.begin(); it != this->userList.end(); it++)
     {
+        close (it->first);
         delete (it->second);
     }
     this->userList.clear();
@@ -150,6 +151,7 @@ void	Server::handleClientRequest(int user_fd)
 		else
 			perror("recv");
 		int sfd = user_fd;
+        this->clearUser(user_fd);
 		close(sfd);
 	}
 	std::string message(buf, 512);
@@ -305,9 +307,39 @@ Channel* Server::findChannel(std::string& channelName, std::map<std::string, Cha
     return channelList[channelName];
 }
 
-// void handleSIGINT(int signal)
-// {
-//     std::cout << "Received SIGINT. Cleaning up and exiting..." << std::endl;
-//     //signal = 0;
-//     g_exitFlag = 1;
-// }
+void    Server::shootMemory()
+{
+    std::map<int, User*>::iterator it;
+    for (it = this->userList.begin(); it != this->userList.end(); it++)
+    {
+        close (it->first);
+        delete (it->second);
+    }
+    this->userList.clear();
+    std::map<std::string, Channel*>::iterator itt;
+    for (itt = this->channelList.begin(); itt != this->channelList.end(); itt++)
+    {
+        delete (it->second);
+    }
+    this->channelList.clear();
+}
+
+void	Server::clearUser(int userFd)
+{
+    User*& target = this->userList[userFd];
+    std::map<std::string, Channel*>::iterator itt;
+    for (itt = this->channelList.begin(); itt != this->channelList.end(); itt++)
+    {
+        itt->second->removeUser(*target);
+    }
+    delete target;
+}
+
+void clear_data(Server& irc)
+{
+    irc.shootMemory();
+    irc._pollfds.clear();
+    close(irc.getSocket());
+    std::cout << "Server closed" << std::endl;
+    exit(0);
+}

@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/12/13 17:47:21 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/14 15:56:38 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,9 @@ struct  s_replie {
     std::string rplReplie;
 };
 
-//int g_exitFlag = 1;
+extern bool Open;
+
+void signal_handler(int sig);
 
 class Server
 {
@@ -52,6 +54,9 @@ class Server
 	void	handleClientRequest(int user_fd);
 	int     getSocket(void);
 	std::string     getPassword(void);
+
+	void	shootMemory();
+	void	clearUser(int userFd);
 	
 	std::vector<struct pollfd>	_pollfds;
 	
@@ -75,4 +80,5 @@ bool    _parcing(std::string buffer, User* sender, std::map<std::string, Channel
 std::string trimBuffers(const std::vector<std::string>& buffer);
 std::string removeSpecificSpaces(const std::string& input);
 void printAsciiCharacters(const std::string& str);
+void    clear_data(Server& irc);
 #endif

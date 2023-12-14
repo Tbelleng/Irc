@@ -6,15 +6,20 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 16:19:46 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/12/13 17:47:37 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/14 15:13:10 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
+bool Open = true;
+
 void runningServer(Server& irc)
 {
-	//std::signal(SIGINT, handleSIGINT);
+	struct sigaction sa = {};
+	sa.sa_handler = signal_handler;
+	sa.sa_flags = SA_RESTART;
+	
     while (true)
     {
 		int open_fds = poll(&irc._pollfds[0], irc._pollfds.size(), -1);
@@ -36,9 +41,20 @@ void runningServer(Server& irc)
 				else
 					irc.handleClientRequest(irc._pollfds[i].fd);
 			}
+			sigemptyset(&sa.sa_mask); // while signal handler is executing, block other signals
+			if (sigaction(SIGINT, &sa, NULL) < 0)
+				clear_data(irc);
 		}
 	}
 	irc.~Server();
+}
+
+void signal_handler(int sig)
+{
+	if (sig == SIGINT)
+	{
+		Open = false;
+	}
 }
 
 
@@ -75,3 +91,4 @@ int main(int argc, char **argv)
     
     return 0;
 }
+
