@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 16:19:46 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/12/14 17:23:48 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/15 17:15:53 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,6 @@ bool Open = true;
 
 void runningServer(Server& irc)
 {
-	struct sigaction sa = {};
-	sa.sa_handler = signal_handler;
-	sa.sa_flags = SA_RESTART;
-	
     while (true)
     {
 		int open_fds = poll(&irc._pollfds[0], irc._pollfds.size(), -1);
@@ -36,17 +32,16 @@ void runningServer(Server& irc)
 			{
 		
 				if (irc._pollfds[i].fd == irc.getSocket())
+				{
 					irc.acceptNewClient();
+				}
 				// If there is ready-to-read data in another socket, a connected client sent data
 				else
 					irc.handleClientRequest(irc._pollfds[i].fd);
 			}
-			sigemptyset(&sa.sa_mask); // while signal handler is executing, block other signals
-			if (sigaction(SIGINT, &sa, NULL) < 0)
-				clear_data(irc);
 		}
 	}
-	irc.~Server();
+	return ;
 }
 
 void signal_handler(int sig)
@@ -77,9 +72,11 @@ int main(int argc, char **argv)
 	unsigned int port = atoi(portStr.c_str());
 	
     Server *irc = new Server(port, password);
-
+	
     irc->createSocket();
 
+	signal(SIGINT, signal_handler);
+	
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(port);
@@ -93,6 +90,8 @@ int main(int argc, char **argv)
     
     runningServer(*irc);
     
+	delete (irc);
+	
     return 0;
 }
 

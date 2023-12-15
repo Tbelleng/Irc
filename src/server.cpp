@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/12/14 16:37:35 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/15 17:08:46 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,17 @@ Server::Server(int port, std::string password)
     this->port = port;
     this->password = password;
 	std::cout << "Server initialized" << std::endl;
+	
+	struct sigaction act, oldact;
+	act.sa_handler = signal_handler;
+	if (sigemptyset(&act.sa_mask) == -1)
+	    std::cout << "Error while SIGINT" << std::endl;
+	act.sa_flags = 0;
+	if (sigaction(SIGINT, NULL, &oldact) == -1)
+	    std::cout << "Error while SIGINT" << std::endl;
+	if (sigaction(SIGINT, &act, NULL) == -1)
+	    std::cout << "Error while SIGINT" << std::endl;
+	
 }
 
 
@@ -137,6 +148,14 @@ std::string	    Server::getPassword(void)
 	return (this->password);
 }
 
+bool    ctrld(std::string message)
+{
+    if (message.find("\r\n") != std::string::npos)
+        return true;
+    else
+        return false;
+}
+
 void	Server::handleClientRequest(int user_fd)
 {
     char buf[512];
@@ -155,10 +174,17 @@ void	Server::handleClientRequest(int user_fd)
 		close(sfd);
 	}
 	std::string message(buf, 512);
+	std::cout << "DEBUG1" <<std::endl;
+	if (!ctrld(message))
+	{
+	    this->bufferList[user_fd] += message;
+	    return ;
+	}
+	std::string merged_message = this->bufferList[user_fd] + message;
 	if (this->ClientCheck(user_fd) == 0)
 	{
-	    fcntl(user_fd, F_SETFL, O_NONBLOCK);
-	    if (!this->GetUserInfo(user_fd, message))
+	    std::cout << "DEBUG2" <<std::endl;
+	    if (!this->GetUserInfo(user_fd, merged_message))
 	    {
 	            std::string error = "Wrong format for registration / Wrong server password, retry...";
 	            send(user_fd, error.c_str(), error.size(), MSG_DONTWAIT);
@@ -171,12 +197,14 @@ void	Server::handleClientRequest(int user_fd)
         send(user_fd, message.c_str(), message.size(), MSG_DONTWAIT);	
         return ;
 	}
-    if (nbytes > 0)
+    else if (nbytes > 0)
 	{
 		User& sender = this->whichUser(user_fd);
-		_parcing(message, sender, this->channelList, this->userList);
+		_parcing(merged_message, sender, this->channelList, this->userList);
 	}
+	this->bufferList[user_fd] = "";
 	message.clear();
+	
 }
 
 int Server::ClientCheck(int user_fd) {
@@ -225,7 +253,6 @@ int Server::GetUserInfo(int user_fd, std::string& buffer)
                     return 0;
                 }
             }
-
             prevKeyword = word;
         }
     }
@@ -235,6 +262,12 @@ int Server::GetUserInfo(int user_fd, std::string& buffer)
     if (nickname.empty() || password.empty() || username.empty() || password != this->getPassword()) 
     {
         return 0;
+    }
+    std::map<int, User*>::iterator it;
+    for (it = this->userList.begin(); it != this->userList.end(); it++)
+    {
+        if ((it)->second->getNickname() == nickname)
+            return 0;
     }
     nickname.erase(std::remove(nickname.begin(), nickname.end(), ' '), nickname.end());
     password.erase(std::remove(password.begin(), password.end(), ' '), password.end());

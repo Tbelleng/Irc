@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:39 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/12/14 17:24:36 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/15 15:14:19 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ class Server
 	struct sockaddr_in serverAddress;
 	std::map<int, User*> userList;
 	std::map<std::string, Channel*> channelList;
+	std::map<int, std::string> bufferList;
+	std::map<int, bool> bufferUsed;
 	
 	public :
 	

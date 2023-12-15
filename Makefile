@@ -15,7 +15,7 @@ DEPS = $(SRCS:$(SRC_DIR)%.cpp=$(OBJS_DIR)%.d)
 INCLUDE = ./include/
 RM = rm -f
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -I$(INCLUDE)
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3 -I$(INCLUDE)
 
 all: $(NAME)
 
