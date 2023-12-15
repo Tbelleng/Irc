@@ -132,11 +132,14 @@ void    Channel::joinBroadcast(User& sender)
 
 void    Channel::broadcasting(std::string msg, int sender_fd)
 {
+    
     std::vector<int>::iterator it;
     for (it = this->_usersFd.begin(); it != this->_usersFd.end(); it++)
     {
         if ((*it) != sender_fd)
+        {
             send((*it), msg.c_str(), msg.length(), 0);
+        }
     }
     return ;
 }

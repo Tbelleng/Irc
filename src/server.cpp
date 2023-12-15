@@ -6,7 +6,7 @@
 /*   By: tbelleng <tbelleng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 17:59:36 by tbelleng          #+#    #+#             */
-/*   Updated: 2023/12/15 17:08:46 by tbelleng         ###   ########.fr       */
+/*   Updated: 2023/12/15 17:58:14 by tbelleng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ Server::~Server(void)
     std::map<std::string, Channel*>::iterator itt;
     for (itt = this->channelList.begin(); itt != this->channelList.end(); itt++)
     {
-        delete (it->second);
+        delete (itt->second);
     }
     this->channelList.clear();
 	std::cout << "Server Destroyed" << std::endl;
@@ -195,6 +195,8 @@ void	Server::handleClientRequest(int user_fd)
         User& sender = this->whichUser(user_fd);
         std::string message = "001 " + sender.GetUserName() + sender.getNickname() + " " + ":Welcome to our Server ! You are Live on Luciefer, Hel-Kame, Tbelleng Network " + "\r\n";
         send(user_fd, message.c_str(), message.size(), MSG_DONTWAIT);	
+        merged_message.clear();
+        message.clear();
         return ;
 	}
     else if (nbytes > 0)
@@ -203,6 +205,7 @@ void	Server::handleClientRequest(int user_fd)
 		_parcing(merged_message, sender, this->channelList, this->userList);
 	}
 	this->bufferList[user_fd] = "";
+	merged_message.clear();
 	message.clear();
 	
 }
